@@ -1,0 +1,100 @@
+/* AboutUs.css */
+.about-us-section {
+    padding: 80px 20px;
+    background-color: #e2e5f7;
+  }
+  
+  .about-us-container {
+    display: flex;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+    gap: 40px;
+  }
+  
+  .about-us-image {
+    flex: 1;
+  }
+  
+  .about-us-image img {
+    width: 100%;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  }
+  
+  .about-us-content {
+    flex: 1;
+  }
+  
+  .about-us-content h2 {
+    font-size: 32px;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 20px;
+  }
+  
+  .about-us-content p {
+    font-size: 16px;
+    color: #555;
+    line-height: 1.8;
+    margin-bottom: 20px;
+  }
+  
+  .learn-more-btn {
+    background-color: #06053f;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 4px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .learn-more-btn:hover {
+    background-color: #333;
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 900px) {
+    .about-us-container {
+      flex-direction: column;
+      text-align: center;
+    }
+  
+    .about-us-image {
+      max-width: 80%;
+    }
+  
+    .about-us-content h2 {
+      font-size: 28px;
+    }
+  
+    .about-us-content p {
+      font-size: 14px;
+    }
+  }
+  
+  @media (max-width: 600px) {
+    .about-us-section {
+      padding: 60px 20px;
+    }
+  
+    .about-us-image {
+      max-width: 100%;
+    }
+  
+    .about-us-content h2 {
+      font-size: 24px;
+    }
+  
+    .about-us-content p {
+      font-size: 14px;
+    }
+  
+    .learn-more-btn {
+      padding: 10px 20px;
+      font-size: 14px;
+    }
+  }

@@ -1,0 +1,123 @@
+/* ContactUs.css */
+.contact-us-section {
+    padding: 80px 20px;
+    background-color: #f3f3f5;
+  }
+  
+  .contact-us-container {
+    display: flex;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+    gap: 40px;
+  }
+  
+  .contact-us-image {
+    flex: 1;
+  }
+  
+  .contact-us-image img {
+    width: 100%;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  }
+  
+  .contact-us-content {
+    flex: 1;
+  }
+  
+  .contact-us-content h2 {
+    font-size: 32px;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 20px;
+  }
+  
+  .contact-us-content p {
+    font-size: 16px;
+    color: #555;
+    line-height: 1.8;
+    margin-bottom: 20px;
+  }
+  
+  .contact-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .form-group input,
+  .form-group textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    color: #333;
+    outline: none;
+    transition: border-color 0.3s ease;
+  }
+  
+  .form-group input:focus,
+  .form-group textarea:focus {
+    border-color: #06053f;
+  }
+  
+  .submit-btn {
+    background-color: #06053f;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 4px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .submit-btn:hover {
+    background-color: #333;
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 900px) {
+    .contact-us-container {
+      flex-direction: column;
+      text-align: center;
+    }
+  
+    .contact-us-image {
+      max-width: 80%;
+    }
+  
+    .contact-us-content h2 {
+      font-size: 28px;
+    }
+  
+    .contact-us-content p {
+      font-size: 14px;
+    }
+  }
+  
+  @media (max-width: 600px) {
+    .contact-us-section {
+      padding: 60px 20px;
+    }
+  
+    .contact-us-image {
+      max-width: 100%;
+    }
+  
+    .contact-us-content h2 {
+      font-size: 24px;
+    }
+  
+    .contact-us-content p {
+      font-size: 14px;
+    }
+  
+    .submit-btn {
+      padding: 10px 20px;
+      font-size: 14px;
+    }
+  }

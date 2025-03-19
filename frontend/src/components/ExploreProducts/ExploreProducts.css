@@ -1,0 +1,95 @@
+.explore-products {
+    text-align: center;
+    padding: 30px 20px;
+}
+
+.explore-products h1 {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+}
+
+.explore-products-text {
+    font-size: 1.2rem;
+    color: #555;
+    max-width: 800px;
+    margin: 0 auto 30px;
+}
+
+/* Ensure the container is centered and scrolls properly */
+.explore-products-container {
+    display: flex;
+    justify-content: center; /* Centers the entire product list */
+    padding: 10px;
+    width: 100%;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    white-space: nowrap;
+}
+
+.explore-products-list {
+    display: flex;
+    gap: 16px;
+    overflow-x: auto;
+    padding: 10px;
+    scroll-behavior: smooth;
+    justify-content: center; /* Center the product list */
+}
+
+/* Hide scrollbar completely */
+.explore-products-list::-webkit-scrollbar {
+    display: none;
+}
+
+.explore-products-list {
+    -ms-overflow-style: none; /* Hide scrollbar for IE and Edge */
+    scrollbar-width: none; /* Hide scrollbar for Firefox */
+}
+
+.explore-products-container::-webkit-scrollbar {
+    height: 8px; /* Set scrollbar height */
+}
+
+.explore-products-container::-webkit-scrollbar-thumb {
+    background-color: #888;
+    border-radius: 4px;
+}
+
+.explore-products-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.product-card {
+    flex: 0 0 auto;
+    width: 300px;
+    text-align: center;
+}
+
+.product-image {
+    width: 200px;
+    height: 250px;
+    border-radius: 50%;
+    object-fit: cover;
+    transition: transform 0.3s ease-in-out;
+}
+
+/* .product-image:hover {
+    transform: scale(1.1);
+} */
+
+.product-name {
+    margin-top: 10px;
+    font-size: 1rem;
+    font-weight: bold;
+}
+
+/* Responsive Fix for Larger Screens */
+@media screen and (min-width: 1000px) {
+    .explore-products-container {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .explore-products-list {
+        justify-content: center;
+    }
+}
