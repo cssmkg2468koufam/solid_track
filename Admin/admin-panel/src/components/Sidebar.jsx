@@ -1,4 +1,5 @@
 import React from 'react'
+import { Link } from 'react-router-dom'
 import 
 {BsCart3, BsGrid1X2Fill, BsFillArchiveFill, BsFillGrid3X3GapFill, BsPeopleFill, 
   BsListCheck, BsMenuButtonWideFill, BsFillGearFill}
@@ -25,39 +26,39 @@ const Sidebar = () => {
 
         <ul className='sidebar-list'>
             <li className='sidebar-list-item'>
-                <a href="">
+                <Link to="/">
                     <BsGrid1X2Fill className='icon'/> Dashboard
-                </a>
+                </Link>
             </li>
             <li className='sidebar-list-item'>
-                <a href="">
+                <Link to="/products">
                     <BsFillArchiveFill className='icon'/> Products
-                </a>
+                </Link>
             </li>
             <li className='sidebar-list-item'>
-                <a href="">
+                <Link to="/Materials">
                     <BsFillGrid3X3GapFill className='icon'/> Materials
-                </a>
-            </li>
+                </Link>
+            </li>   
             <li className='sidebar-list-item'>
-                <a href="">
+                <Link to="/customers">
                     <BsPeopleFill className='icon'/> Customers
-                </a>
+                </Link>
             </li>
             <li className='sidebar-list-item'>
-                <a href="">
+                <Link to="/orders">
                     <BsListCheck className='icon'/> Orders
-                </a>
+                </Link>
             </li>
             <li className='sidebar-list-item'>
-                <a href="">
+                <Link to="/approve-payments">
                     <BsMenuButtonWideFill className='icon'/> Approve Payments
-                </a>
+                </Link>
             </li>
             <li className='sidebar-list-item'>
-                <a href="">
+                <Link to="/settings">
                     <BsFillGearFill className='icon'/> Settings
-                </a>
+                </Link>
             </li>
         </ul>
     </aside>
