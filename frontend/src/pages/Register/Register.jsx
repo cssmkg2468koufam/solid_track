@@ -8,7 +8,7 @@ const Register = () => {
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [agreeTerms, setAgreeTerms] = useState(false);
+  //const [agreeTerms, setAgreeTerms] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
 
@@ -17,17 +17,23 @@ const Register = () => {
     setError(null);
     setSuccess(null);
 
+    if (password !== confirmPassword) {
+      setError("Passwords do not match. Please try again.");
+      return;
+    }
+    
+
     const userData= {
       fullName,
       email,
       phone,
       password,
       confirmPassword,
-      agree_terms: agreeTerms,
+      //agree_terms: agreeTerms,
     };
 
     try {
-      const response = await fetch("http://localhost:5002/routes/userRoutes/register/customer", {
+      const response = await fetch("http://localhost:5001/routes/userRoutes/register/customer", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"},

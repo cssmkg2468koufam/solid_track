@@ -13,11 +13,10 @@
   width: 100%;
 }
 
-/* Left panel styles */
 .left-panel {
   flex: 1;
   background-color: #a7631f;
-  background-image: url('../../assets/login_page_design2.webp'); /* You'll need to add this image */
+  background-image: url('../../assets/login_page_design2.webp'); 
   background-size: cover;
   background-position: center;
   background-blend-mode: multiply;
@@ -44,7 +43,6 @@
   opacity: 0.9;
 }
 
-/* Right panel styles */
 .right-panel {
   flex: 1;
   background-color: white;

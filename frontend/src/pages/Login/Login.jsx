@@ -14,7 +14,7 @@ const Login = () => {
     setSuccessMessage('');
 
     try {
-      const response = await fetch("http://localhost:5002/routes/userRoutes/login", {
+      const response = await fetch("http://localhost:5001/routes/userRoutes/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
@@ -35,7 +35,7 @@ const Login = () => {
       // Redirect to homepage after successful login
       window.location.href = "/home";
     } catch (err) {
-      setError(err.message);
+      setError(err.message);  
     }
   };
 
@@ -60,8 +60,8 @@ const Login = () => {
             <h3>Login</h3>
             <p className="welcome-text">Welcome Back! Please enter your details.</p>
 
-            {error && <p className="error-message">{error}</p>} {/* ✅ Display error */}
-            {successMessage && <p className="success-message">{successMessage}</p>} {/* ✅ Display success message */}
+            {error && <p className="error-message">{error}</p>} {/* Display error */}
+            {successMessage && <p className="success-message">{successMessage}</p>} {/* Display success message */}
 
             
             <form onSubmit={handleSubmit}>

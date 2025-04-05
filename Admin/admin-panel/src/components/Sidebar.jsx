@@ -12,9 +12,6 @@ const Sidebar = () => {
         setOpenSidebarToggle(!openSidebarToggle)
     }
 
-
-
-
   return (
     <aside id="sidebar" className={openSidebarToggle ? "sidebar-responsive": ""}>
         <div className='sidebar-title'>
@@ -53,6 +50,11 @@ const Sidebar = () => {
             <li className='sidebar-list-item'>
                 <Link to="/approve-payments">
                     <BsMenuButtonWideFill className='icon'/> Approve Payments
+                </Link>
+            </li>
+            <li className='sidebar-list-item'>
+                <Link to="/customers">
+                    <BsPeopleFill className='icon'/> Suppliers
                 </Link>
             </li>
             <li className='sidebar-list-item'>

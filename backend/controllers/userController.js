@@ -2,21 +2,28 @@ const bcrypt = require("bcryptjs");
 const { createCustomer, getCustomerByEmail} = require("../models/userModel");
 
 const registerCustomer = async (req, res) => {
-    const {fullName, email, phone, password, agree_terms} = req.body;
-    if (!fullName || !email || !phone || !password) {
-        return res.status(400).json({error: "Please fill all fields"});
+    const { fullName, email, phone, password, confirmPassword } = req.body;
+
+    // Validate required fields
+    if (!fullName || !email || !phone || !password || !confirmPassword) {
+        return res.status(400).json({ error: "Please fill all fields" });
     }
 
-    try{
+
+    try {
+        // Hash the password
         const password_hash = await bcrypt.hash(password, 10);
-        await createCustomer(fullName, email, phone, password_hash, agree_terms);
-        res.status(201).json({message: "User created successfully"});
+
+        // Create the customer
+        await createCustomer(fullName, email, phone, password_hash);
+
+        res.status(201).json({ message: "User created successfully" });
+    } catch (err) {
+        console.error("Error registering customer:", err);
+        res.status(500).json({ error: "Internal Server Error" });
     }
-    catch(err){    
-        console.error("Error registering customer:",err);
-        res.status(500).json({error: "Internal Server error"});
-    }
-}
+};
+
 
 const loginCustomer = async (req, res) => {
     const { email, password } = req.body;
