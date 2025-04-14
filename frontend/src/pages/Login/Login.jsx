@@ -103,7 +103,7 @@ const Login = () => {
             </form>
             
             <div className="register-prompt">
-              <p>Don't have an account? <a href="/register" onClick={(e) => {e.preventDefault(); navigateToRegister();}}>Sign up for free</a></p>
+              <p>Don't have an account? <a href="/register" onClick={(e) => {e.preventDefault(); navigateToRegister();}}>Sign up</a></p>
             </div>
           </div>
         </div>

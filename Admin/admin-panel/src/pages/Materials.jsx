@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FaEdit, FaTrash } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
 import '../App.css';
 
 const Materials = () => {
@@ -27,6 +28,8 @@ const Materials = () => {
     price: ''
   });
 
+  const navigate = useNavigate();
+
   const unitOptions = [
     { value: 'cubic_meters', label: 'Cubic Meters (m³)' },
     { value: 'kg', label: 'Kilograms (kg)' },
@@ -35,7 +38,6 @@ const Materials = () => {
     { value: 'liters', label: 'Liters (L)' }
   ];
 
-  // Date formatting function
   const formatDate = (dateString) => {
     if (!dateString) return '';
     try {
@@ -43,7 +45,7 @@ const Materials = () => {
       return date.toISOString().split('T')[0];
     } catch (e) {
       console.error('Error formatting date:', e);
-      return dateString.split('T')[0]; // Fallback to simple split if Date parsing fails
+      return dateString.split('T')[0];
     }
   };
 
@@ -100,6 +102,10 @@ const Materials = () => {
 
   const handleExportToExcel = () => {
     console.log('Export to Excel clicked');
+  };
+
+  const handleViewDetails = () => {
+    navigate('/details', { state: { materials } });
   };
 
   const handleEdit = (material) => {
@@ -211,6 +217,7 @@ const Materials = () => {
         <h1>Raw Materials</h1>
         <div className="header-actions">
           <button className="export-btn" onClick={handleExportToExcel}>Export to Excel</button>
+          <button className="details-btn" onClick={handleViewDetails}>Details</button>
           <button className="add-btn" onClick={handleAddMaterial}>+ New Material</button>
         </div>
       </div>
@@ -276,6 +283,10 @@ const Materials = () => {
           <div className="modal-content">
             <h2>Add New Material</h2>
             <form onSubmit={handleSubmit}>
+            <div className="form-group">
+                <label>Material ID</label>
+                <input type="text" name="id" value={newMaterial.id} onChange={handleChange} required />
+              </div>
               <div className="form-group">
                 <label>Material Name</label>
                 <input type="text" name="name" value={newMaterial.name} onChange={handleChange} required />

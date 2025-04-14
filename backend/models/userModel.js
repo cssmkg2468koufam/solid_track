@@ -1,7 +1,5 @@
 const pool = require("../config/db");
 
-
-
 const createCustomer = async (fullName, email, phone, password_hash) => {
     const query = 
          `INSERT INTO customer (full_name, email, phone, password_hash) VALUES (?, ?, ?, ?)`;

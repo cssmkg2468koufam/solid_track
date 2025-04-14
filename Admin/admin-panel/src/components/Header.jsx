@@ -12,7 +12,7 @@ const Header = () => {
       </div> 
       <div className='header-right'>
         <BsFillBellFill className='icon' />
-        <BsFillEnvelopeFill className='icon' />
+        {/* <BsFillEnvelopeFill className='icon' /> */}
         <BsPersonCircle className='icon' />
       </div>
     </header>
