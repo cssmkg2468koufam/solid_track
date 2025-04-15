@@ -109,7 +109,7 @@ const Products = () => {
       <div className="header">
         <h1>Products</h1>
         <div className="header-actions">
-          <button className="btn export" onClick={handleExport}>Export to Excel</button>
+          <button className="btn export" onClick={handleExport}>Export</button>
           <button className="btn new" onClick={() => setShowAddModal(true)}>+ New Product</button>
         </div>
       </div>

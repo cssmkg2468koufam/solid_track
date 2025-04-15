@@ -11,6 +11,24 @@ const Register = () => {
   //const [agreeTerms, setAgreeTerms] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
+  const [passwordErrors, setPasswordErrors] = useState({
+    length: false,
+    uppercase: false,
+    lowercase: false,
+    number: false,
+    specialChar: false,
+  });
+  const validatePassword = (password) => {
+    const errors = {
+      length: password.length >= 8,
+      uppercase: /[A-Z]/.test(password),
+      lowercase: /[a-z]/.test(password),
+      number: /[0-9]/.test(password),
+      specialChar: /[!@#$%^&*(),.?":{}|<>]/.test(password),
+    };
+    setPasswordErrors(errors);
+    return Object.values(errors).every(Boolean);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -21,9 +39,12 @@ const Register = () => {
       setError("Passwords do not match. Please try again.");
       return;
     }
-    
-
-    const userData= {
+    if (!validatePassword(password)) {
+      setError("Password does not meet requirements.");
+      return;
+      }
+      
+      const userData= {
       fullName,
       email,
       phone,
@@ -97,7 +118,11 @@ const Register = () => {
                 <input
                   type="tel"
                   value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
+                  onChange={(e) => {
+                    // Remove any non-numeric characters
+                    const numericValue = e.target.value.replace(/\D/g, '');
+                    setPhone(numericValue);
+                  }}
                   placeholder="Mobile Number"
                   required
                 />
@@ -107,10 +132,32 @@ const Register = () => {
                 <input
                   type="password"
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    validatePassword(e.target.value);
+                  }}
                   placeholder="Password"
                   required
                 />
+                {password && (
+                  <div className="password-validation">
+                    <p className={passwordErrors.length ? 'valid' : 'invalid'}>
+                      ✓ At least 8 characters
+                    </p>
+                    <p className={passwordErrors.uppercase ? 'valid' : 'invalid'}>
+                      ✓ At least one uppercase letter
+                    </p>
+                    <p className={passwordErrors.lowercase ? 'valid' : 'invalid'}>
+                      ✓ At least one lowercase letter
+                    </p>
+                    <p className={passwordErrors.number ? 'valid' : 'invalid'}>
+                      ✓ At least one number
+                    </p>
+                    <p className={passwordErrors.specialChar ? 'valid' : 'invalid'}>
+                      ✓ At least one special character
+                    </p>
+                  </div>
+                )}
               </div>
               
               <div className="form-group">

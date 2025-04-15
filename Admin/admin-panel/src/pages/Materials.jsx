@@ -216,7 +216,7 @@ const Materials = () => {
       <div className="header">
         <h1>Raw Materials</h1>
         <div className="header-actions">
-          <button className="export-btn" onClick={handleExportToExcel}>Export to Excel</button>
+          <button className="export-btn" onClick={handleExportToExcel}>Export</button>
           <button className="details-btn" onClick={handleViewDetails}>Details</button>
           <button className="add-btn" onClick={handleAddMaterial}>+ New Material</button>
         </div>

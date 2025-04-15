@@ -111,7 +111,7 @@
   font-size: 0.85rem;
 }
 
-.terms-checkbox {
+/* .terms-checkbox {
   display: flex;
   align-items: flex-start;
 }
@@ -128,6 +128,23 @@
 
 .terms-checkbox a:hover {
   text-decoration: underline;
+} */
+
+
+.password-validation {
+  margin-top: 5px;
+  font-size: 0.8rem;
+}
+
+.password-validation p {
+  margin: 2px 0;
+  color: #ff4444;
+  text-align: justify; /* Red for invalid */
+}
+
+.password-validation .valid {
+  color: #00C851; 
+  text-align: justify; /* Green for valid */
 }
 
 .register-button {
