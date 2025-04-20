@@ -6,10 +6,10 @@
   padding: 2px 1px;
   background-color: #ffffff;
   box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-  width: 100%; /* Ensure navbar spans the full width */
-  left: 0; /* Align to the left edge */
-  top: 0; /* Align to the top edge */
-  z-index: 1000; /* Ensure it stays on top of other content */
+  width: 100%;
+  left: 0;
+  top: 0;
+  z-index: 1000;
 }
 
 .navbar img {
@@ -25,16 +25,17 @@
 }
 
 .nav-link {
-  text-decoration: none; /* Remove underline */
-  color: black; /* Set text color to black */
+  text-decoration: none;
+  color: black;
   font-size: 16px;
   font-weight: 500;
   transition: color 0.3s ease;
 }
 
 .nav-link:hover {
-  color: #007bff; /* Change hover color if needed */
+  color: #007bff;
 }
+
 .navbar-right {
   display: flex;
   align-items: center;
@@ -69,11 +70,47 @@ button {
   padding: 7px 15px;
   border-radius: 5px;
   cursor: pointer;
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 500;
   transition: background-color 0.3s;
+  margin-right: 10px;
 }
 
 button:hover {
   background-color: #0056b3;
+}
+
+/* New styles for profile section */
+.profile-icon-container {
+  display: flex;
+  align-items: center;
+  gap: 25px;
+}
+
+.profile-icon {
+  width: 20px;
+  height: 30px;
+  cursor: pointer;
+  border-radius: 20%;
+}
+
+.profile-icon:hover {
+  background-color: #d1cece;
+  border-radius: 60%;
+}
+
+.logout-button {
+  background-color: #ffffff;
+  color: #dc3545;
+  border: none;
+  border-radius: 5px;
+  padding: 6px 14px;
+  font-size: 16px;
+  margin-right: 10px;
+  font-weight: 500;
+  transition: background-color 0.3s;
+}
+
+.logout-button:hover {
+  background-color: #d6d0d1;
 }

@@ -32,8 +32,7 @@ const Login = () => {
       // Store user in local storage
       localStorage.setItem("user", JSON.stringify(data.user));
 
-      // Redirect to homepage after successful login
-      window.location.href = "/home";
+      window.location.href = "/"; // This will force a full page reload and show the updated NavBar
     } catch (err) {
       setError(err.message);  
     }

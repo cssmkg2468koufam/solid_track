@@ -4,9 +4,11 @@ import "./NavBar.css";
 import logo from "../../assets/logo.png";
 import search_icon from "../../assets/search_icon.png";
 import basket_icon from "../../assets/basket_icon.png";
+import profile_icon from "../../assets/profile_icon.png"; // Add this import
 
 const NavBar = () => {
   const navigate = useNavigate();
+  const user = JSON.parse(localStorage.getItem("user"));
 
   const handleScrollToSection = (sectionId) => {
     navigate("/"); // Navigate to the home page first
@@ -18,12 +20,21 @@ const NavBar = () => {
     }, 100); // Small delay to ensure the page is loaded
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    window.location.href = "/"; // Refresh to update NavBar
+  };
+
   return (
     <div className="navbar">
       <img src={logo} alt="Logo" />
       <ul className="navbar-container">
         <li>
-        <button style={{backgroundColor:"white"}} onClick={() => handleScrollToSection("home")} className="nav-link">
+          <button 
+            style={{backgroundColor:"white"}} 
+            onClick={() => handleScrollToSection("home")} 
+            className="nav-link"
+          >
             Home
           </button>
         </li>
@@ -32,27 +43,43 @@ const NavBar = () => {
             Products
           </Link>
         </li>
-        {/* <li>
-          <button style={{backgroundColor:"white"}} onClick={() => handleScrollToSection("contact-us")} className="nav-link">
-            Contact Us
-          </button>
-        </li> */}
         <li>
-          <button style={{backgroundColor:"white"}} onClick={() => handleScrollToSection("about-us")} className="nav-link">
+          <button 
+            style={{backgroundColor:"white"}} 
+            onClick={() => handleScrollToSection("about-us")} 
+            className="nav-link"
+          >
             About Us
           </button>
         </li>
       </ul>
       <div className="navbar-right" id="navbar-right">
-        <img src={search_icon} alt="" />
+        <img src={search_icon} alt="Search" />
         <div className="navbar-search-icon">
-          <img src={basket_icon} alt="" />
+          <img src={basket_icon} alt="Cart" />
           <div className="dot"></div>
         </div>
         <nav>
-          <Link to="/login">
-            <button>Sign In</button>
-          </Link>
+          {user ? (
+            <div className="profile-icon-container">
+              <img 
+                src={profile_icon} 
+                alt="Profile" 
+                className="profile-icon"
+                onClick={() => navigate("/profile")}
+              />
+              <button 
+                onClick={handleLogout}
+                className="logout-button"
+              >
+                Logout
+              </button>
+            </div>
+          ) : (
+            <Link to="/login">
+              <button>Sign In</button>
+            </Link>
+          )}
         </nav>
       </div>
     </div>

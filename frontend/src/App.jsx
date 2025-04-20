@@ -9,6 +9,8 @@ import Login from './pages/Login/Login'
 import ProductDetails from './pages/Product_Details/Product_Details';
 import Register from './pages/Register/Register'
 import Footer from './components/Footer/Footer'
+import Profile from './pages/Profile/Profiile'
+
 
 const App = () => {
   return (
@@ -18,7 +20,6 @@ const App = () => {
           <Route path='/login' element={null} />
           <Route path='/register' element={null} />
           <Route path='*' element={<NavBar />} /> 
-          <Route path='/home' element={<Home />} />
         </Routes>
         
         <div>
@@ -30,6 +31,7 @@ const App = () => {
             <Route path="/product/:id" element={<ProductDetails />} />
             <Route path='/login' element={<Login/>}/>
             <Route path='/register' element={<Register/>}/>
+            <Route path='/profile' element={<Profile/>}/>
 
           </Routes>
           
@@ -45,3 +47,5 @@ const App = () => {
 };
 
 export default App;
+
+
