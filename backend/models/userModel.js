@@ -10,6 +10,12 @@ const getCustomerByEmail = async (email) => {
     const query = "SELECT * FROM customer WHERE email = ?";
     const [rows] = await pool.query(query, [email]);
     return rows.length > 0 ? rows[0] : null;
+}
+
+const getCustomerEmail = async (customerId) => {
+    const query = "SELECT * FROM customer WHERE customer_id = ?";
+    const [rows] = await pool.query(query, [customerId]);
+    return rows.length > 0 ? rows[0] : null;
 };
 
-module.exports = { createCustomer, getCustomerByEmail };
+module.exports = { createCustomer, getCustomerByEmail, getCustomerEmail };

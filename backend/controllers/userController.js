@@ -1,7 +1,13 @@
-const { createCustomer, getCustomerByEmail } = require("../models/userModel");
+const { createCustomer, getCustomerByEmail, getCustomerEmail } = require("../models/userModel");
 
 const registerCustomer = async (req, res) => {
     const { fullName, email, phone, password, confirmPassword } = req.body;
+
+    // Check if email already exists
+    const existingCustomer = await getCustomerByEmail(email);
+    if (existingCustomer) {
+        return res.status(400).json({ error: "Email already in use" });
+    }
 
     // Validate required fields
     if (!fullName || !email || !phone || !password || !confirmPassword) {
@@ -55,6 +61,21 @@ const loginCustomer = async (req, res) => {
         console.error("Error during login:", err);
         res.status(500).json({ error: "Internal Server Error" });
     }
-};
+}
 
-module.exports = { registerCustomer, loginCustomer };
+const checkEmailExists = async (req, res) => {
+    try {
+        const { email } = req.query;
+        if (!email) {
+            return res.status(400).json({ error: "Email is required" });
+        }
+
+        const customer = await getCustomerEmail(email);
+        res.json({ exists: !!customer });
+    } catch (err) {
+        console.error("Error checking email:", err);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+}
+
+module.exports = { registerCustomer, loginCustomer, checkEmailExists };

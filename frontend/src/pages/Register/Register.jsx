@@ -10,6 +10,7 @@ const Register = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   //const [agreeTerms, setAgreeTerms] = useState(false);
   const [error, setError] = useState(null);
+  const [emailError, setEmailError] = useState(null);
   const [success, setSuccess] = useState(null);
   const [passwordErrors, setPasswordErrors] = useState({
     length: false,
@@ -30,11 +31,33 @@ const Register = () => {
     return Object.values(errors).every(Boolean);
   };
 
+  const checkEmailExists = async (email) => {
+    try {
+      const response = await fetch(`http://localhost:5001/routes/userRoutes/check-email?email=${encodeURIComponent(email)}`);
+      const data = await response.json();
+      return data.exists;
+    } catch (err) {
+      console.error("Error checking email:", err);
+      return false;
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
     setSuccess(null);
+    setEmailError(null);
 
+    if (!email) {
+      setEmailError("Email is required");
+      return;
+    }
+    // Check if email exists
+    const emailExists = await checkEmailExists(email);
+    if (emailExists) {
+      setEmailError("Email already in use");
+      return;
+    }
     if (password !== confirmPassword) {
       setError("Passwords do not match. Please try again.");
       return;
@@ -109,9 +132,20 @@ const Register = () => {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  onBlur={async () => {
+                    if (email) {
+                      const exists = await checkEmailExists(email);
+                      if (exists) {
+                        setEmailError("Email already in use");
+                      } else {
+                        setEmailError(null);
+                      }
+                    }
+                  }}
                   placeholder="Email Address"
                   required
                 />
+                {emailError && <p className="error-text">{emailError}</p>}
               </div>
 
               <div className="form-group">
