@@ -4,11 +4,13 @@ import "./NavBar.css";
 import logo from "../../assets/logo.png";
 import search_icon from "../../assets/search_icon.png";
 import basket_icon from "../../assets/basket_icon.png";
-import profile_icon from "../../assets/profile_icon.png"; // Add this import
+import profile_icon from "../../assets/profile_icon.png";
 
 const NavBar = () => {
   const navigate = useNavigate();
-  const user = JSON.parse(localStorage.getItem("user"));
+  const customer = JSON.parse(localStorage.getItem("customer"));
+  const admin = JSON.parse(localStorage.getItem("admin"));
+  const user = customer || admin;
 
   const handleScrollToSection = (sectionId) => {
     navigate("/"); // Navigate to the home page first
@@ -21,7 +23,9 @@ const NavBar = () => {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("user");
+    localStorage.removeItem("customer");
+    localStorage.removeItem("admin");
+    localStorage.removeItem("role");
     window.location.href = "/"; // Refresh to update NavBar
   };
 
@@ -39,7 +43,7 @@ const NavBar = () => {
           </button>
         </li>
         <li>
-          <Link to="/products" className="nav-link">
+          <Link to="/customerproducts" className="nav-link">
             Products
           </Link>
         </li>

@@ -73,6 +73,7 @@ const Register = () => {
       phone,
       password,
       confirmPassword,
+      role: "customer"
       //agree_terms: agreeTerms,
     };
 

@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import '../App.css';
+import './AppAdmin.css';
+import Sidebar from '../components/Sidebar';
+import Header from '../components/Header';
 
 const Products = () => {
   const [products, setProducts] = useState([]);
@@ -105,6 +107,9 @@ const Products = () => {
   };
 
   return (
+    <div className="grid-container">
+        <Header />
+        <Sidebar />
     <div className="product-page">
       <div className="header">
         <h1>Products</h1>
@@ -219,6 +224,7 @@ const Products = () => {
           </div>
         </div>
       )}
+    </div>
     </div>
   );
 };

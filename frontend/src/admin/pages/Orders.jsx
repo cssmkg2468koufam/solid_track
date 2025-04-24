@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { FaEdit, FaTrash } from 'react-icons/fa';
-import '../App.css';
-
+import './AppAdmin.css';
+import Sidebar from '../components/Sidebar';
+import Header from '../components/Header';
 const Orders = () => {
 const [searchTerm, setSearchTerm] = useState('');
 
@@ -10,7 +11,7 @@ const [searchTerm, setSearchTerm] = useState('');
         {
             orderId: "#0014",
             deliveryDate: "04/30/2024",
-            customer: "Ramesh Chaudhary",
+            customer: "Samarasinghe",
             fullAmount: "1000",
             location: "Kurunegala",
             quantity: "3",
@@ -19,7 +20,7 @@ const [searchTerm, setSearchTerm] = useState('');
         {
             orderId: "#0016",
             deliveryDate: "04/30/2024",
-            customer: "Ramesh Chaudhary",
+            customer: "Gunawardhana",
             fullAmount: "2000",
             location: "Polgahawela",
             quantity: "3",
@@ -69,7 +70,11 @@ const [searchTerm, setSearchTerm] = useState('');
         }
     }
 
-    return <div className="order-page">
+    return (
+    <div className="grid-container">
+        <Header />
+        <Sidebar />
+    <div className="order-page">
         <div className="header">
             <h1>Orders</h1>
             <div className="header-actions">
@@ -90,7 +95,7 @@ const [searchTerm, setSearchTerm] = useState('');
 
       <div className="table-section">
          (
-          <table className="custom-table">
+          <table className="order-table">
             <thead>
               <tr>
                 <th>Order ID</th>
@@ -130,7 +135,10 @@ const [searchTerm, setSearchTerm] = useState('');
           </table>
         )
       </div>
+    </div> 
     </div>
+
+    );
 }
 
 export default Orders;

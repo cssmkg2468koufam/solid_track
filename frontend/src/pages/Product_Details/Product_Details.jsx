@@ -223,7 +223,7 @@ const ProductDetails = () => {
           </div>
           <div className="product-actions">
             <button className="add-to-cart-btn">Add to Cart</button>
-            <Link to="/products" className="back-btn">Back to Products</Link>
+            <Link to="/customerproducts" className="back-btn">Back to Products</Link>
           </div>
         </div>
       </div>

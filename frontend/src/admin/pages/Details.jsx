@@ -1,5 +1,7 @@
 import React from 'react';
-import '../App.css';
+import './AppAdmin.css';
+import Sidebar from '../components/Sidebar';
+import Header from '../components/Header';
 
 const materials = [
   {
@@ -35,6 +37,9 @@ const materials = [
 const Details = () => {
   
   return (
+    <div className="grid-container">
+        <Header />
+        <Sidebar />
     <div className="details-container">
       <h1 className="details-title">Material Inventory</h1>
       
@@ -57,6 +62,7 @@ const Details = () => {
           </div>
         ))}
       </div>
+    </div>
     </div>
   );
 };

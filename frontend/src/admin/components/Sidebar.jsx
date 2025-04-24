@@ -23,43 +23,38 @@ const Sidebar = () => {
 
         <ul className='sidebar-list'>
             <li className='sidebar-list-item'>
-                <Link to="/">
+                <Link to="/dashboard-admin">
                     <BsGrid1X2Fill className='icon'/> Dashboard
                 </Link>
             </li>
             <li className='sidebar-list-item'>
-                <Link to="/products">
+                <Link to="/products-admin">
                     <BsFillArchiveFill className='icon'/> Products
                 </Link>
             </li>
             <li className='sidebar-list-item'>
-                <Link to="/Materials">
+                <Link to="/Materials-admin">
                     <BsFillGrid3X3GapFill className='icon'/> Materials
                 </Link>
             </li>   
             <li className='sidebar-list-item'>
-                <Link to="/customers">
+                <Link to="/customers-admin">
                     <BsPeopleFill className='icon'/> Customers
                 </Link>
             </li>
             <li className='sidebar-list-item'>
-                <Link to="/orders">
+                <Link to="/orders-admin">
                     <BsListCheck className='icon'/> Orders
                 </Link>
             </li>
             <li className='sidebar-list-item'>
-                <Link to="/approve-payments">
+                <Link to="/approve-payments-admin">
                     <BsMenuButtonWideFill className='icon'/> Approve Payments
                 </Link>
             </li>
             <li className='sidebar-list-item'>
-                <Link to="/customers">
+                <Link to="/supplier-admin">
                     <BsPeopleFill className='icon'/> Suppliers
-                </Link>
-            </li>
-            <li className='sidebar-list-item'>
-                <Link to="/settings">
-                    <BsFillGearFill className='icon'/> Settings
                 </Link>
             </li>
         </ul>

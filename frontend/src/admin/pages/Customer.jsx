@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { FaEdit, FaTrash } from 'react-icons/fa';
-import '../App.css';
+import './AppAdmin.css';
+import Sidebar from '../components/Sidebar';
+import Header from '../components/Header';
 
 const Customers = () => {
   const [customers, setCustomers] = useState([]);
@@ -67,6 +69,9 @@ const Customers = () => {
   }
 
   return (
+    <div className="grid-container">
+        <Header />
+        <Sidebar />
     <div className="customer-page">
       <div className="header">
         <h1> Customers </h1>
@@ -123,6 +128,7 @@ const Customers = () => {
           </table>
         )
       </div>
+    </div>
     </div>
   );
 };

@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { FaEdit, FaTrash } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
-import '../App.css';
+import './AppAdmin.css';
+import Sidebar from '../components/Sidebar';
+import Header from '../components/Header';
 
 const Materials = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -212,6 +214,9 @@ const Materials = () => {
   }
 
   return (
+    <div className="grid-container">
+        <Header />
+        <Sidebar />
     <div className="materials-page">
       <div className="header">
         <h1>Raw Materials</h1>
@@ -372,6 +377,7 @@ const Materials = () => {
           </div>
         </div>
       )}
+    </div>
     </div>
   );
 };

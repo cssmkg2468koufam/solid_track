@@ -1,12 +1,17 @@
 import React, { useState } from 'react';
 import './Login.css';
 import google_icon from '../../assets/google_icon.png'; 
+import { useNavigate } from 'react-router-dom';
+
 
 const Login = () => {
+  const[id, setId] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');  
   const [successMessage, setSuccessMessage] = useState(''); 
+  const navigate = useNavigate();
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -27,12 +32,42 @@ const Login = () => {
       }
 
       setSuccessMessage("Login successful!");
-      console.log("Logged in user:", data.user);
+      console.log("Logged in user:", data);
+      console.log("error:", data.error); // Log error if any
       
-      // Store user in local storage
-      localStorage.setItem("user", JSON.stringify(data.user));
+      localStorage.setItem("user", JSON.stringify({
+        id: data.user.id,
+        name: data.user.fullName || data.user.email,
+        email: data.user.email,
+        phone: data.user.phone || '',
+        role: data.user.role,
+      }));
+      console.log("User role:", data.user.role); // Log user role
+      console.log("id:", data.user.id); // Log user ID
+      
+      if (data.user.role === 'customer') {
+        localStorage.setItem("customer", JSON.stringify({
+          username: data.user.fullName,
+          email: data.user.email,
+          phone: data.user.phone,
+          customer_id: data.user.id,
+          role:data.user.role,
+        })); // Store customer details
 
-      window.location.href = "/"; // This will force a full page reload and show the updated NavBar
+        navigate("/")
+      } else if(data.user.role === 'admin') {
+        console.log("Admin role detected"); // Log admin role detection
+        console.log("Admin data:", data); // Log admin data
+        localStorage.setItem("admin", JSON.stringify({
+          email: data.user.email,
+          admin_id: data.user.id,
+          role:data.user.role,
+        })); // Store admin details
+
+        navigate("/dashboard-admin")
+      } else {
+        throw new Error("Invalid user ");
+      }
     } catch (err) {
       setError(err.message);  
     }
