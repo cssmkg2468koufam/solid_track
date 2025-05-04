@@ -54,6 +54,7 @@
   align-items: center;
   justify-content: center;
   padding: 2rem;
+  
 }
 
 .form-container {
@@ -85,6 +86,14 @@
   color: #666;
   margin-bottom: 2rem;
   font-size: 0.9rem;
+}
+.success-message{
+  color: #120b7a;
+  font-size: 1rem;
+}
+.error-message{
+  color: #ff4444;
+  font-size: 1rem;
 }
 
 .form-group {

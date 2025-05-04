@@ -302,7 +302,7 @@ const Materials = () => {
               </div>
               <div className="form-group">
                 <label>Quantity</label>
-                <input type="number" name="quantity" value={newMaterial.quantity} onChange={handleChange} required />
+                <input type="number" name="quantity" value={newMaterial.quantity} onChange={handleChange} min="0" required />
               </div>
               <div className="form-group">
                 <label>Unit</label>
@@ -314,7 +314,7 @@ const Materials = () => {
               </div>
               <div className="form-group">
                 <label>Price</label>
-                <input type="number" name="price" value={newMaterial.price} onChange={handleChange} required />
+                <input type="number" name="price" value={newMaterial.price} onChange={handleChange} min="0" step="0.01" required />
               </div>
               <div className="form-group">
                 <label>Purchase Date</label>
@@ -324,7 +324,6 @@ const Materials = () => {
                 <label>Stock Status</label>
                 <select name="stock" value={newMaterial.stock} onChange={handleChange}>
                   <option value="In Stock">In Stock</option>
-                  <option value="Low Stock">Low Stock</option>
                 </select>
               </div>
               <div className="modal-actions">
@@ -355,7 +354,7 @@ const Materials = () => {
               </div>
               <div className="form-group">
                 <label>Quantity</label>
-                <input type="number" name="quantity" value={editingMaterial.quantity} onChange={handleEditChange} required />
+                <input type="number" name="quantity" value={editingMaterial.quantity} onChange={handleEditChange} min="0" required />
               </div>
               <div className="form-group">
                 <label>Unit</label>
@@ -367,7 +366,7 @@ const Materials = () => {
               </div>
               <div className="form-group">
                 <label>Price</label>
-                <input type="number" name="price" value={editingMaterial.price} onChange={handleEditChange} required />
+                <input type="number" name="price" value={editingMaterial.price} onChange={handleEditChange} min="0" step="0.01"  required />
               </div>
               <div className="modal-actions">
                 <button type="submit" className="save-btn">Update</button>

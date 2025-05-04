@@ -34,14 +34,16 @@ const Login = () => {
       setSuccessMessage("Login successful!");
       console.log("Logged in user:", data);
       console.log("error:", data.error); // Log error if any
+
+      localStorage.setItem("token", data.user.token );
       
-      localStorage.setItem("user", JSON.stringify({
-        id: data.user.id,
-        name: data.user.fullName || data.user.email,
-        email: data.user.email,
-        phone: data.user.phone || '',
-        role: data.user.role,
-      }));
+      // localStorage.setItem("user", JSON.stringify({
+      //   id: data.user.id,
+      //   name: data.user.fullName || data.user.email,
+      //   email: data.user.email,
+      //   phone: data.user.phone || '',
+      //   role: data.user.role,
+      // }));
       console.log("User role:", data.user.role); // Log user role
       console.log("id:", data.user.id); // Log user ID
       
@@ -52,9 +54,11 @@ const Login = () => {
           phone: data.user.phone,
           customer_id: data.user.id,
           role:data.user.role,
+          
         })); // Store customer details
 
         navigate("/")
+        
       } else if(data.user.role === 'admin') {
         console.log("Admin role detected"); // Log admin role detection
         console.log("Admin data:", data); // Log admin data

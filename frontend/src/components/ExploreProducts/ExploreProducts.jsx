@@ -35,11 +35,11 @@ const ExploreProducts = () => {
                     {products.map(product => (
                         <div 
                             key={product.id} 
-                            className="product-card" 
+                            className="product-card-EP" 
                             onClick={() => handleClick(product.category)}
                             style={{ cursor: 'pointer' }}
                         >
-                            <img src={product.image} alt={product.name} className="product-image" />
+                            <img src={product.image} alt={product.name} className="product-image-EP" />
                             <p className="product-name">{product.name}</p>
                         </div>
                     ))}

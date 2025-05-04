@@ -43,11 +43,10 @@ const AdminProfile = () => {
         setIsEditing(true);
     }
     const handlelogout = () => {
-        localStorage.removeItem("user");
-        localStorage.removeItem("customer");
         localStorage.removeItem("admin");
         localStorage.removeItem("role");
-        localStorage.removeItem("email")
+        localStorage.removeItem("email");
+        localStorage.removeItem("token")
         window.location.href = "/"; // Refresh to update NavBar
         
     }

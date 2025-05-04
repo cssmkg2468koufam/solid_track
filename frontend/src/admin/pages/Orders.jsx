@@ -9,22 +9,22 @@ const [searchTerm, setSearchTerm] = useState('');
 
     const orders = [
         {
-            orderId: "#0014",
-            deliveryDate: "04/30/2024",
-            customer: "Samarasinghe",
-            fullAmount: "1000",
-            location: "Kurunegala",
-            quantity: "3",
-            status: "Pending"
+            orderId: " ",
+            deliveryDate: " ",
+            customer: " ",
+            fullAmount: " ",
+            location: " ",
+            quantity: " ",
+            status: " "
         },
         {
-            orderId: "#0016",
-            deliveryDate: "04/30/2024",
-            customer: "Gunawardhana",
-            fullAmount: "2000",
-            location: "Polgahawela",
-            quantity: "3",
-            status: "Pending"
+            orderId: " ",
+            deliveryDate: " ",
+            customer: " ",
+            fullAmount: " ",
+            location: " ",
+            quantity: " ",
+            status: " "
         }
     ];
 
@@ -118,10 +118,10 @@ const [searchTerm, setSearchTerm] = useState('');
                     <td>{order.location}</td>
                     <td>{order.quantity}</td>
                     <td>{order.status}</td>
-                    <td>
+                    {/* <td>
                         <FaEdit className="edit-icon" onClick={() => handleEdit(customer)} />
                         <FaTrash className="delete-icon" onClick={() => handleDelete(customer?.customer_id)} />
-                    </td>
+                    </td> */}
                     </tr>
                 ))
               ) : (

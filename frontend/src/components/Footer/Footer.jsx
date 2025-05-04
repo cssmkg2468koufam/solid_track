@@ -13,7 +13,7 @@ const Footer = () => {
           <h4>Quick Links</h4>
           <nav className="footer-links">
             <a href="/">Home</a>
-            <a href="/products">Products</a>
+            <a href="/customerproducts">Products</a>
             <a href="#about-us">About Us</a> {/* Anchor link to About Us section */}
             <a href="#contact-us">Contact Us</a> {/* Anchor link to Contact Us section */}
           </nav>

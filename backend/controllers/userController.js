@@ -1,4 +1,5 @@
 const { createCustomer, getCustomerByEmail, getCustomerEmail,createNewAdmin , getAdminByEmail} = require("../models/userModel");
+const jwt= require("jsonwebtoken");
 
 const createAdmin = async () => {
     const adminEmail = "admin@gmail.com"
@@ -68,6 +69,9 @@ const loginUser = async (req, res) => {
         if (!user) {
             return res.status(401).json({ error: "Invalid email or password" });
         }
+
+        const token = jwt.sign({id:user.id, email:user.email, role}, "your_jwt_secret",{expiresIn:"1h"});
+
         res.status(200).json({
             message: "Login successful",
             user: {
@@ -76,6 +80,7 @@ const loginUser = async (req, res) => {
                 email: user.email,
                 phone: user.phone,
                 role: role, // Include the role in the response
+                token
             },
         });
         console.log("Logged in user:", user); // Log the logged-in user

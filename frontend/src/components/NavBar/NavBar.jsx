@@ -26,6 +26,8 @@ const NavBar = () => {
     localStorage.removeItem("customer");
     localStorage.removeItem("admin");
     localStorage.removeItem("role");
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
     window.location.href = "/"; // Refresh to update NavBar
   };
 
@@ -61,7 +63,8 @@ const NavBar = () => {
         <img src={search_icon} alt="Search" />
         <div className="navbar-search-icon">
           <img src={basket_icon} alt="Cart" />
-          <div className="dot"></div>
+          <div className="dot">
+          </div>
         </div>
         <nav>
           {user ? (

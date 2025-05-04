@@ -123,7 +123,7 @@ const Register = () => {
                   type="text"
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
-                  placeholder="Full Name"
+                  placeholder="Name"
                   required
                 />
               </div>
