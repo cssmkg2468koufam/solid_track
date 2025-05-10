@@ -3,7 +3,6 @@ import { Route, Routes } from 'react-router-dom'
 import NavBar from './components/NavBar/NavBar';
 import Home from './pages/Home/Home'
 import Cart from './pages/Cart/Cart'
-import PlaceOrder from './pages/PlaceOrder/PlaceOrder'
 import CustomerProducts from './pages/CustomerProducts/CustomerProducts'
 import Login from './pages/Login/Login'
 import ProductDetails from './pages/Product_Details/Product_Details';
@@ -18,6 +17,8 @@ import Orders from './admin/pages/Orders'
 import Products from './admin/pages/Products'
 import Supplier from './admin/pages/Supplier'
 import AdminProfile from './admin/pages/AdminProfile' // Import the Admin Profile component
+import CheckoutPage from './pages/CheckoutPage/CheckoutPage';
+import CustomerOrder from './pages/CustomerOrder/CustomerOrder';
 
 
 const App = () => {
@@ -35,14 +36,15 @@ const App = () => {
           <Route path='/orders-admin' element={null} /> {/* Admin App component */}
           <Route path='/supplier-admin' element={null} /> {/* Admin App component */}
           <Route path='/adminprofile-admin' element={null} /> {/* Admin Profile component */}
+          <Route path='/checkoutpage' element={null} /> {/* Admin Profile component */}
           <Route path='*' element={<NavBar />} /> 
+          
         </Routes>
         
         <div>
           <Routes>
             <Route path='/' element={<Home/>}/>
             <Route path='/cart' element={<Cart/>}/>
-            <Route path='/order' element={<PlaceOrder/>}/>
             <Route path="/customerproducts" element={<CustomerProducts />} />
             <Route path="/product/:id" element={<ProductDetails />} />
             <Route path='/login' element={<Login/>}/>
@@ -56,6 +58,8 @@ const App = () => {
             <Route path='/orders-admin' element={<Orders />} /> {/* Admin App component */}
             <Route path='/supplier-admin' element={<Supplier />} /> {/* Admin App component */}
             <Route path='/adminprofile-admin' element={<AdminProfile />} /> {/* Admin Profile component */}
+            <Route path='/checkoutpage' element={<CheckoutPage />} />
+            <Route path='/customerorder' element={<CustomerOrder />} />
 
           </Routes>
           
@@ -71,6 +75,7 @@ const App = () => {
             <Route path="/orders-admin" element={<null />} />
             <Route path="/supplier-admin" element={<null />} />
             <Route path="/adminprofile-admin" element={<null />} />
+            <Route path="/checkoutpage" element={<null />} />
             <Route path='*' element={<Footer />} />
           </Routes>
         </div>

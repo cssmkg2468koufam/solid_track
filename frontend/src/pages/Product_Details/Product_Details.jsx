@@ -8,10 +8,14 @@ const ProductDetails = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showLoginPopup, setShowLoginPopup] = useState(false);
+  const [showOrderConfirmation, setShowOrderConfirmation] = useState(false);
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [cartMessage, setCartMessage] = useState('');
+  const [deliveryDate, setDeliveryDate] = useState('');
+  const [location, setLocation] = useState('');
   const navigate = useNavigate();
+
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -39,18 +43,70 @@ const ProductDetails = () => {
     fetchProduct();
   }, [id]);
 
-  const handleBuyNow = async () => {
+  const handleOrderNow = async () => {
     const token = localStorage.getItem("token");
 
     if (!token) {
       setShowLoginPopup(true);
     } else {
-      navigate("/checkoutpage");
+      setShowOrderConfirmation(true);
     }
   };
 
+  const handleConfirmOrder = async () => {
+    if (!deliveryDate || !location) {
+      alert('Please fill in all fields');
+      return;
+    }
+  
+    try {
+      const token = localStorage.getItem("token");
+      const customerData = JSON.parse(localStorage.getItem("customer"));
+      const customer_id = customerData?.customer_id;
+
+      const response = await fetch('http://localhost:5001/routes/orderRoutes/add', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          product_id: product.product_id,
+          quantity: quantity,
+          total: product.price_of_one_product * quantity,
+          customer_id: customerData.customer_id,
+          delivery_date: deliveryDate,
+          location: location
+        })
+      });
+  
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to place order');
+      }
+
+      setShowOrderConfirmation(false);
+  
+      alert("Order placed successfully. Awaiting admin approval.");
+    } catch (error) {
+      console.error('Order error:', error);
+      alert("Failed to place order. Please try again later.");
+    }
+  };
+
+  const handleCloseOrderConfirmation = () => {
+    setShowOrderConfirmation(false);
+    setDeliveryDate('');
+    setLocation('');
+  };
+ 
+
   const handleAddToCart = async () => {
     const token = localStorage.getItem("token");
+    const customerData = JSON.parse(localStorage.getItem("customer"));
+  const customer_id = customerData?.customer_id;
+
+  
     
     if (!token) {
       setShowLoginPopup(true);
@@ -65,12 +121,18 @@ const ProductDetails = () => {
           'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
-          productId: product._id,
-          quantity: quantity
+          customer_id: customer_id,
+          product_id: product.product_id,
+          quantity: quantity,
+          total: product.price_of_one_product * quantity
         })
       });
 
       if (!response.ok) {
+        if (response.status === 409) {
+          setCartMessage('Item already in cart!');
+          return;
+        }
         throw new Error('Failed to add to cart');
       }
 
@@ -151,6 +213,53 @@ const ProductDetails = () => {
           </div>
         </div>
       )}
+
+      {/* order confirmation popup */}
+      {showOrderConfirmation && (
+        <div className="order-confirmation-overlay">
+          <div className="order-confirmation-popup">
+            <h3>Confirm Your Order</h3>
+            <p>Please provide delivery details:</p>
+            
+            <div className="form-group">
+              <label htmlFor="deliveryDate">Delivery Date:</label>
+              <input
+                type="date"
+                id="deliveryDate"
+                value={deliveryDate}
+                onChange={(e) => setDeliveryDate(e.target.value)}
+                min={new Date().toISOString().split('T')[0]} // Prevent past dates
+                required
+              />
+            </div>
+            
+            <div className="form-group">
+              <label htmlFor="location">Delivery Location:</label>
+              <input
+                type="text"
+                id="location"
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+                placeholder="Enter your delivery address"
+                required
+              />
+            </div>
+            
+            <div className="order-summary">
+              <h4>Order Summary</h4>
+              <p><strong>Product:</strong> {product.product_name}</p>
+              <p><strong>Quantity:</strong> {quantity}</p>
+              <p><strong>Total:</strong> Rs. {(product.price_of_one_product * quantity).toLocaleString()}</p>
+            </div>
+            
+            <div className="popup-buttons">
+              <button className="cancel-btn" onClick={handleCloseOrderConfirmation}>Cancel</button>
+              <button className="confirm-btn" onClick={handleConfirmOrder}>Confirm Order</button>
+            </div>
+          </div>
+        </div>
+      )}
+
       
       <div className="breadcrumb">
         <span onClick={() => navigate('/')}>Home</span> &gt; 
@@ -160,17 +269,6 @@ const ProductDetails = () => {
 
       <div className="product-details-container">
         <div className="product-gallery">
-          <div className="thumbnail-container">
-            {productImages.map((img, index) => (
-              <div 
-                key={index} 
-                className={`thumbnail ${selectedImage === index ? 'active' : ''}`}
-                onClick={() => setSelectedImage(index)}
-              >
-                <img src={img} alt={`Thumbnail ${index + 1}`} />
-              </div>
-            ))}
-          </div>
           <div className="main-image">
             {productImages[selectedImage] ? (
               <img src={productImages[selectedImage]} alt={product.product_name} />
@@ -180,7 +278,7 @@ const ProductDetails = () => {
           </div>
         </div>
         
-        <div className="product-info">
+        <div className="customer-product-info">
           <h1 className="product-title">{product.product_name}</h1>
           
           <div className="price-section">
@@ -230,32 +328,20 @@ const ProductDetails = () => {
               </button>
             </div>
           </div>
-          
-          <div className="delivery-info">
-            <div className="delivery-option">
-              <i className="delivery-icon">🚚</i>
-              <span>Free delivery on orders over Rs. 1000</span>
-            </div>
-            <div className="delivery-option">
-              <i className="delivery-icon">⏱️</i>
-              <span>Estimated delivery: 2-3 business days</span>
-            </div>
-          </div>
-          
+
           <div className="product-actions">
             <button 
               className="add-to-cart-btn"
               onClick={handleAddToCart}
               disabled={product.quantity <= 0}
-            >
-              <i className="cart-icon">🛒</i> Add to Cart
+            > Add to Cart
             </button>
             <button 
               className={`buy-now-btn ${product.quantity <= 0 ? 'disabled' : ''}`} 
-              onClick={handleBuyNow}
+              onClick={handleOrderNow}
               disabled={product.quantity <= 0}
             >
-              Buy Now
+              Place Order
             </button>
           </div>
           
@@ -265,25 +351,13 @@ const ProductDetails = () => {
             </div>
           )}
           
-          <div className="product-highlights">
-            <h3>Highlights</h3>
-            <ul>
-              <li>Premium quality materials</li>
-              <li>Manufacturer warranty included</li>
-              <li>Easy returns within 15 days</li>
-              {product.highlights && product.highlights.map((h, i) => (
-                <li key={i}>{h}</li>
-              ))}
-            </ul>
-          </div>
         </div>
       </div>
       
       <div className="product-details-section">
         <div className="details-tabs">
           <button className="tab-active">Description</button>
-          <button>Specifications</button>
-          <button>Shipping Info</button>
+
         </div>
         
         <div className="tab-content">

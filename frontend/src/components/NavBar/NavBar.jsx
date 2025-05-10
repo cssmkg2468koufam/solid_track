@@ -2,15 +2,14 @@ import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./NavBar.css";
 import logo from "../../assets/logo.png";
-import search_icon from "../../assets/search_icon.png";
 import basket_icon from "../../assets/basket_icon.png";
 import profile_icon from "../../assets/profile_icon.png";
 
-const NavBar = () => {
+const NavBar = () => {  
   const navigate = useNavigate();
   const customer = JSON.parse(localStorage.getItem("customer"));
   const admin = JSON.parse(localStorage.getItem("admin"));
-  const user = customer || admin;
+  const user = customer;
 
   const handleScrollToSection = (sectionId) => {
     navigate("/"); // Navigate to the home page first
@@ -30,6 +29,15 @@ const NavBar = () => {
     localStorage.removeItem("token");
     window.location.href = "/"; // Refresh to update NavBar
   };
+
+  const handleCart = () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/login");
+    } else {
+      navigate("/cart");
+    }
+  }
 
   return (
     <div className="navbar">
@@ -60,11 +68,17 @@ const NavBar = () => {
         </li>
       </ul>
       <div className="navbar-right" id="navbar-right">
-        <img src={search_icon} alt="Search" />
-        <div className="navbar-search-icon">
-          <img src={basket_icon} alt="Cart" />
-          <div className="dot">
-          </div>
+        {user && (
+          <button 
+            className="my-orders-button"
+            onClick={() => navigate("/customerorder")}
+          >
+            My Orders
+          </button>
+        )}
+        <div className="navbar-cart-icon">
+          <img src={basket_icon} alt="Cart" onClick={handleCart}/>
+          <div className="dot"></div>
         </div>
         <nav>
           {user ? (

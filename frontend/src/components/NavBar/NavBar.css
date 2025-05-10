@@ -47,20 +47,21 @@
   cursor: pointer;
 }
 
-.navbar-search-icon {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
 
-.navbar-search-icon .dot {
-  min-width: 10px;
-  min-height: 10px;
-  background-color: red;
+.my-orders-button {
+  background: #fffdfd;
+  color: #1b00b1;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  padding: 8px 12px;
+  margin-right: 20px; /* Adjust as needed */
+  /* Other existing styles */
+  /* Add other styles to match your design */
+}
+.my-orders-button:hover {
+  background: #ffffff;
   border-radius: 5px;
-  position: absolute;
-  top: -8px;
-  right: -8px;
 }
 
 button {

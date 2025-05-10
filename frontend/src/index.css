@@ -4,11 +4,11 @@
   box-sizing: border-box;
 }
 
-/* body {
+body {
   min-height: 100vh;
   font-family: 'Montserrat', sans-serif;
   background-color: white;
-} */
+}
 
 /* a {
   text-decoration: none;
@@ -24,7 +24,7 @@
   0% {
       opacity: 0;
   }
-  100% {
+  100% {  
       opacity: 1;
   }
 }

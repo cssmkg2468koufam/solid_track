@@ -8,7 +8,7 @@ const Hero = () => {
         <div className="hero-contents">
             <h2>Order your product here</h2>
             <p>Discover a wide range of durable and stylish concrete products, crafted to enhance your space with strength and elegance</p>
-            <Link to="/products"><button>View Products</button></Link>
+            <Link to="/customerproducts"><button>View Products</button></Link>
         </div>
     </div>
   )

@@ -94,7 +94,7 @@ const [searchTerm, setSearchTerm] = useState('');
       </div>
 
       <div className="table-section">
-         (
+         
           <table className="order-table">
             <thead>
               <tr>
@@ -133,7 +133,7 @@ const [searchTerm, setSearchTerm] = useState('');
               )}
             </tbody>
           </table>
-        )
+        
       </div>
     </div> 
     </div>
