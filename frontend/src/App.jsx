@@ -19,6 +19,8 @@ import Supplier from './admin/pages/Supplier'
 import AdminProfile from './admin/pages/AdminProfile' // Import the Admin Profile component
 import CheckoutPage from './pages/CheckoutPage/CheckoutPage';
 import CustomerOrder from './pages/CustomerOrder/CustomerOrder';
+import ApprovePayments from './admin/pages/ApprovePayments' // Import the Admin App component
+import InvoicePage from './pages/Invoice/InvoicePage'; // Import the InvoicePage component
 
 
 const App = () => {
@@ -34,9 +36,11 @@ const App = () => {
           <Route path='/products-admin' element={null} /> {/* Admin App component */}
           <Route path='/customers-admin' element={null} /> {/* Admin App component */}
           <Route path='/orders-admin' element={null} /> {/* Admin App component */}
+          <Route path='/approve-payments-admin' element={null} /> {/* Admin App component */}
           <Route path='/supplier-admin' element={null} /> {/* Admin App component */}
           <Route path='/adminprofile-admin' element={null} /> {/* Admin Profile component */}
           <Route path='/checkoutpage' element={null} /> {/* Admin Profile component */}
+          <Route path='/approve-payments-admin' element={null} /> {/* Admin Profile component */}
           <Route path='*' element={<NavBar />} /> 
           
         </Routes>
@@ -56,10 +60,12 @@ const App = () => {
             <Route path='/products-admin' element={<Products />} /> {/* Admin App component */}
             <Route path='/customers-admin' element={<Customer />} /> {/* Admin App component */}
             <Route path='/orders-admin' element={<Orders />} /> {/* Admin App component */}
+            <Route path='/approve-payments-admin' element={<ApprovePayments />} /> {/* Admin App component */}
             <Route path='/supplier-admin' element={<Supplier />} /> {/* Admin App component */}
             <Route path='/adminprofile-admin' element={<AdminProfile />} /> {/* Admin Profile component */}
-            <Route path='/checkoutpage' element={<CheckoutPage />} />
-            <Route path='/customerorder' element={<CustomerOrder />} />
+            <Route path='//checkout' element={<CheckoutPage />} />
+            <Route path='/customerorders' element={<CustomerOrder />} />
+            <Route path="/invoice/:orderId" element={<InvoicePage />} />
 
           </Routes>
           
@@ -76,6 +82,7 @@ const App = () => {
             <Route path="/supplier-admin" element={<null />} />
             <Route path="/adminprofile-admin" element={<null />} />
             <Route path="/checkoutpage" element={<null />} />
+            <Route path="/approve-payments-admin" element={<null />} />
             <Route path='*' element={<Footer />} />
           </Routes>
         </div>

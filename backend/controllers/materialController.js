@@ -11,14 +11,14 @@ const getAllMaterials = async (req, res) => {
 }
 
 const CreateMaterial = async (req, res) => {
-    const { name, supplier, quantity, unit, price, purchase_date, stock } = req.body;
+    const { material_id, name, supplier, quantity, unit, price, purchase_date, stock } = req.body;
 
-    if (!name || !supplier || !quantity || !unit || !price || !purchase_date || !stock) {
+    if (!material_id || !name || !supplier || !quantity || !unit || !price || !purchase_date || !stock) {
         return res.status(400).json({ error: 'Please fill all fields' });
     }
 
     try {
-        await createMaterialModel(name, supplier, quantity, unit, price, purchase_date, stock);
+        await createMaterialModel(material_id, name, supplier, quantity, unit, price, purchase_date, stock);
         res.status(201).json({ message: 'Material created successfully' });
     } catch (err) {
         console.error('Error creating material:', err);
@@ -39,7 +39,7 @@ const deleteMaterial = async (req, res) => {
 
 const editMaterial = async (req, res) => {
     const { id } = req.params;
-    const { name, supplier, quantity, unit, price } = req.body;
+    const { name, supplier, quantity, unit, price, purchase_date } = req.body;
 
     if (!name || !supplier || !quantity || !unit || !price) {
         return res.status(400).json({ error: 'Please fill all required fields' });

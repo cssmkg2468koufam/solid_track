@@ -204,3 +204,29 @@
 .retry-btn:hover {
   background-color: #0b7dda;
 }
+
+.proceed-payment-btn {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 10px 0;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.3s;
+}
+
+.proceed-payment-btn:hover {
+  background-color: #45a049;
+}
+
+.order-actions {
+  text-align: right;
+  padding: 10px;
+  border-top: 1px solid #eee;
+  margin-top: 10px;
+}

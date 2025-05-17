@@ -6,24 +6,11 @@ const getMaterials = async () => {
     return rows;    
 }
 
-const createMaterialModel = async (name, supplier, quantity, unit, price, purchase_date, stock) => {
-    // Get the highest existing material_id
-    const [result] = await pool.query("SELECT MAX(material_id) as maxId FROM materials");
-    let nextNumber = 1;
-    
-    // Extract number from the highest ID if exists
-    if (result[0].maxId) {
-        const maxId = result[0].maxId;
-        const currentNumber = parseInt(maxId.replace('MT0', ''));
-        nextNumber = currentNumber + 1;
-    }
-    
-    const nextId = `MT0${nextNumber}`;
-    
+const createMaterialModel = async (material_id, name, supplier, quantity, unit, price, purchase_date, stock) => {
     const query = `INSERT INTO materials 
         (material_id, name, supplier, quantity, unit, price, purchase_date, stock) 
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
-    return pool.query(query, [nextId, name, supplier, quantity, unit, price, purchase_date, stock]);
+    return pool.query(query, [material_id, name, supplier, quantity, unit, price, purchase_date, stock]);
 }
 
 const deleteMaterialModel = async (material_id) => {

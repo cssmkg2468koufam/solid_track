@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { loadStripe } from '@stripe/stripe-js';
+
 import { useNavigate } from 'react-router-dom';
 import './CustomerOrder.css';
+
+const stripePromise = loadStripe('pk_test_51RNVXHF2XYRh3d2iLEcpEx2QodkbOO76ENgN6RffgmKp90kgpnXvSt0BInWFcBfXfivtNXquLFXO95emR40wedBV005zYzTaG4');
 
 const CustomerOrder = () => {
   const [orders, setOrders] = useState([]);
@@ -72,13 +76,13 @@ const CustomerOrder = () => {
       });
     });
 
-     // Now compute total for each order
-  Object.values(grouped).forEach(order => {
-    order.total = order.items.reduce(
-      (sum, item) => sum + item.quantity * item.price_of_one_product,
-      0
-    );
-  });
+    // Now compute total for each order
+    Object.values(grouped).forEach(order => {
+      order.total = order.items.reduce(
+        (sum, item) => sum + item.quantity * item.price_of_one_product,
+        0
+      );
+    });
 
     return Object.values(grouped);
   };
@@ -87,8 +91,8 @@ const CustomerOrder = () => {
     switch (status.toLowerCase()) {
       case 'pending': return 'status-badge-pending';
       case 'approved': return 'status-badge-approved';
-      case 'shipped': return 'status-badge-shipped';
-      case 'delivered': return 'status-badge-delivered';
+      case 'paid': return 'status-badge-shipped';
+      case 'pending_pay': return 'status-badge-delivered';
       case 'cancelled': return 'status-badge-cancelled';
       default: return 'status-badge-pending';
     }
@@ -98,6 +102,14 @@ const CustomerOrder = () => {
     const options = { year: 'numeric', month: 'long', day: 'numeric' };
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
+
+  // Replace the handleProceedToPayment function with:
+const handleProceedToPayment = (order_id, total) => {
+  navigate('/checkout', { state: { order_id, total } });
+};
+
+    
+
 
   if (loading) {
     return (
@@ -121,6 +133,7 @@ const CustomerOrder = () => {
     );
   }
 
+
   return (
     <div className="customer-orders-page">
       <h1>Your Orders</h1>
@@ -142,8 +155,8 @@ const CustomerOrder = () => {
                   <span className="order-date">Placed on {formatDate(order.created_at)}</span>
                 </div>
                 <div className={`order-status ${getStatusBadgeClass(order.status)}`}>
-  Status: {order.status}
-</div>
+                  Status: {order.status}
+                </div>
               </div>
 
               {order.items.map((item, index) => (
@@ -178,6 +191,18 @@ const CustomerOrder = () => {
                   <span>Rs. {order.total.toLocaleString()}</span>
                 </div>
               </div>
+
+              {/* Add Proceed to Payment button for approved orders */}
+              {order.status.toLowerCase() === 'approved' && (
+  <div className="order-actions">
+    <button 
+      onClick={() => handleProceedToPayment(order.order_id, order.total)}
+      className="proceed-payment-btn"
+    >
+      Proceed to Payment
+    </button>
+  </div>
+)}
             </div>
           ))}
         </div>

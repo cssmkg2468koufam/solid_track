@@ -1,13 +1,28 @@
-const {getOrders, deleteOrderModel, createOrder,addOrderItem, getCustomerOrderModel} = require('../models/orderModel');
+
+
+
+const {
+  getOrders, 
+  deleteOrderModel, 
+  createOrder,
+  addOrderItem, 
+  getCustomerOrderModel,
+  updateOrderStatusModel,
+   getOrderDetailsForInvoiceModel,
+  getOrderItemsByOrderId,
+  getRawMaterialsForProduct,
+  reduceMaterialQuantity
+
+} = require('../models/orderModel');
 
 const getAllOrders = async (req, res) => {
-    try {
-        const orders = await getOrders();
-        res.status(200).json(orders);
-    } catch (err) {
-        console.error('Error getting orders:', err);
-        res.status(500).json({ error: 'Internal Server Error' });
-    }
+  try {
+    const orders = await getOrders();
+    res.status(200).json(orders);
+  } catch (err) {
+    console.error('Error getting orders:', err);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
 }
 
 const addFullOrder = async (req, res) => {
@@ -18,10 +33,8 @@ const addFullOrder = async (req, res) => {
   }
 
   try {
-    // Create order and get order_id
     const order_id = await createOrder(customer_id, delivery_date, location);
 
-    // Insert each item into order_items table
     for (const item of items) {
       await addOrderItem(order_id, item.product_id, item.quantity, item.total);
     }
@@ -33,27 +46,90 @@ const addFullOrder = async (req, res) => {
   }
 };
 
-
 const deleteOrder = async (req, res) => {
-    const { id } = req.params;
-    try {
-        await deleteOrderModel(id);
-        res.status(200).json({ message: 'Order deleted successfully' });
-    } catch (err) {
-        console.error('Error deleting order:', err);
-        res.status(500).json({ error: 'Internal Server Error' });
-    }
+  const { id } = req.params;
+  try {
+    await deleteOrderModel(id);
+    res.status(200).json({ message: 'Order deleted successfully' });
+  } catch (err) {
+    console.error('Error deleting order:', err);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
 }
 
 const getCustomerOrder = async (req, res) => {
-    const { customer_id } = req.params;
-    try {
-        const orders = await getCustomerOrderModel(customer_id);
-        res.status(200).json(orders);
-    } catch (err) {
-        console.error('Error getting customer orders:', err);
-        res.status(500).json({ error: 'Internal Server Error' });
-    }
+  const { customer_id } = req.params;
+  try {
+    const orders = await getCustomerOrderModel(customer_id);
+    res.status(200).json(orders);
+  } catch (err) {
+    console.error('Error getting customer orders:', err);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
 };
 
-module.exports = { getAllOrders, deleteOrder , addFullOrder, getCustomerOrder };
+const updateOrderStatus = async (req, res) => {
+  const { order_id } = req.params;
+  const { status } = req.body;
+
+  const validStatuses = ['pending', 'approved', 'shipped', 'delivered', 'cancelled', 'arranged'];
+  if (!validStatuses.includes(status)) {
+    return res.status(400).json({ error: 'Invalid status value' });
+  }
+  try {
+    await updateOrderStatusModel(order_id, status);
+
+    // 👇 Only proceed if status is 'arranged'
+    if (status === 'arranged') {
+      const orderItems = await getOrderItemsByOrderId(order_id);
+
+      for (const item of orderItems) {
+        const rawMaterials = await getRawMaterialsForProduct(item.product_id);
+
+        for (const raw of rawMaterials) {
+          const totalRequiredQty = raw.quantity_required * item.quantity;
+          await reduceMaterialQuantity(raw.material_id, totalRequiredQty);
+        }
+      }
+    }
+
+    res.status(200).json({ message: 'Order status updated successfully' });
+  } catch (err) {
+    console.error('Error updating order status:', err);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
+const getOrderDetailsForInvoice = async (req, res) => {
+  const { order_id } = req.params;
+  try {
+    const order = await getOrderDetailsForInvoiceModel(order_id);
+    
+    if (!order) {
+      return res.status(404).json({ error: 'Order not found' });
+    }
+
+    // Calculate total if not already done in the model
+    order.total = order.items.reduce(
+      (sum, item) => sum + (item.quantity * item.price_of_one_product),
+      0
+    );
+
+    res.status(200).json(order);
+  } catch (err) {
+    console.error('Error getting order details for invoice:', err);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
+
+
+module.exports = { 
+  getAllOrders, 
+  deleteOrder, 
+  addFullOrder, 
+  getCustomerOrder,
+  updateOrderStatus ,
+  getOrderDetailsForInvoice,
+
+};

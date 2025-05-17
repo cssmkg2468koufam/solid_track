@@ -12,6 +12,9 @@ const Products = () => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
+const [materials, setMaterials] = useState([]); // New state for materials
+  const [selectedMaterials, setSelectedMaterials] = useState([]); // New state for selected materials
+  
   
   const [newProduct, setNewProduct] = useState({
     productName: '',
@@ -25,6 +28,7 @@ const Products = () => {
 
   useEffect(() => {
     fetchProducts();
+    fetchMaterials();
   }, []);
 
   const fetchProducts = async () => {
@@ -50,6 +54,23 @@ const Products = () => {
     }
   };
 
+  const fetchMaterials = async () => {
+    try {
+      const response = await fetch('http://localhost:5001/routes/materialRoutes/get', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+      const materials = await response.json();
+      setMaterials(materials);
+    } catch (err) {
+      console.error('Error fetching materials:', err);
+      setError(err.message);
+    }
+  };
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setNewProduct(prev => ({
@@ -58,38 +79,97 @@ const Products = () => {
     }));
   };
 
-  const handleAddProduct = async (e) => {
-    e.preventDefault();
-    try {
-      const response = await fetch('http://localhost:5001/routes/productRoutes/add', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(newProduct),
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      await response.json();
-      fetchProducts();
-      setNewProduct({
-        productName: '',
-        description: '',
-        quantity: 0,
-        price: 0,
-        status: 'In Stock',
-        category: 'Flower Pots',
-        imageUrl: ''
-      });
-      setShowAddModal(false);
-    } catch (err) {
-      console.error('Error adding product:', err);
-      setError(err.message);
-    }
+  // Handle material selection change
+  const handleMaterialChange = (index, field, value) => {
+    const updatedMaterials = [...selectedMaterials];
+    updatedMaterials[index] = {
+      ...updatedMaterials[index],
+      [field]: value
+    };
+    setSelectedMaterials(updatedMaterials);
   };
+
+  // Add a new material row
+  const addMaterialRow = () => {
+    setSelectedMaterials([...selectedMaterials, { material_id: '', quantity_required: 0, unit: '' }]);
+  };
+
+  // Remove a material row
+  const removeMaterialRow = (index) => {
+    const updatedMaterials = [...selectedMaterials];
+    updatedMaterials.splice(index, 1);
+    setSelectedMaterials(updatedMaterials);
+  };
+
+
+  const handleAddProduct = async (e) => {
+  e.preventDefault();
+  try {
+    // First, create the product
+    const response = await fetch('http://localhost:5001/routes/productRoutes/add', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(newProduct),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const productData = await response.json();
+    
+    // Make sure we have the product ID
+    if (!productData.product_id && !productData.insertId) {
+      throw new Error('Failed to get product ID from response');
+    }
+    
+    const productId = productData.product_id || productData.insertId;
+
+    // Then, add the materials if any are selected
+    if (selectedMaterials.length > 0) {
+      const materialPromises = selectedMaterials
+        .filter(material => material.material_id && material.quantity_required > 0)
+        .map(material => 
+          fetch('http://localhost:5001/routes/productRoutes/addMaterial', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              product_id: productId,
+              material_id: material.material_id,
+              quantity_required: material.quantity_required,
+              unit: material.unit
+            }),
+          })
+        );
+
+      // Wait for all material additions to complete
+      await Promise.all(materialPromises);
+    }
+
+    // Refresh the products list
+    fetchProducts();
+    
+    // Reset form state
+    setNewProduct({
+      productName: '',
+      description: '',
+      quantity: 0,
+      price: 0,
+      status: 'In Stock',
+      category: 'Flower Pots',
+      imageUrl: ''
+    });
+    setSelectedMaterials([]);
+    setShowAddModal(false);
+  } catch (err) {
+    console.error('Error adding product:', err);
+    setError(`Error adding product: ${err.message}`);
+  }
+};
 
   const handleEdit = (product) => {
     setEditingProduct({
@@ -329,6 +409,8 @@ const Products = () => {
                     placeholder="/images/flowerpots_1.jpg"
                   />
                 </div>
+                
+
                 <div className="form-group">
                   <label>Status</label>
                   <select
@@ -339,6 +421,60 @@ const Products = () => {
                     <option value="In Stock">In Stock</option>
                     <option value="Out of Stock">Out of Stock</option>
                   </select>
+                </div>
+                <div className="form-group">
+                  <label>Required Materials</label>
+                  <button type="button" onClick={addMaterialRow} className="add-material-btn">
+                    + Add Material
+                  </button>
+                  
+                  {selectedMaterials.map((material, index) => (
+                    <div key={index} className="material-row">
+                      <select
+                        value={material.material_id}
+                        onChange={(e) => handleMaterialChange(index, 'material_id', e.target.value)}
+                        required
+                      >
+                        <option value="">Select Material</option>
+                        {materials.map(mat => (
+                          <option key={mat.material_id} value={mat.material_id}>
+                            {mat.name} ({mat.stock})
+                          </option>
+                        ))}
+                      </select>
+                      
+                      <input
+                        type="number"
+                        value={material.quantity_required}
+                        onChange={(e) => handleMaterialChange(index, 'quantity_required', e.target.value)}
+                        min="0"
+                        step="0.01"
+                        placeholder="Quantity"
+                        required
+                      />
+                      
+                      <select
+                        value={material.unit}
+                        onChange={(e) => handleMaterialChange(index, 'unit', e.target.value)}
+                        required
+                      >
+                        <option value="">Select Unit</option>
+                        <option value="kg">kg</option>
+                        <option value="cubic_meters">cubic_meters</option>
+                        <option value="bags">bags</option>
+                        <option value="liters">liters</option>
+
+                      </select>
+                      
+                      <button 
+                        type="button" 
+                        onClick={() => removeMaterialRow(index)}
+                        className="remove-material-btn"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
                 </div>
                 <div className="modal-actions">
                   <button type="submit" className="save-btn">Save</button>

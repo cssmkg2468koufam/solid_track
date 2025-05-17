@@ -846,6 +846,92 @@
   font-size: 12px;
   font-weight: 500;
 }
+/* Status select dropdown styling */
+.status-select {
+  padding: 5px 10px;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.status-select.pending {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+.status-select.approved {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.status-select.shipped {
+  background-color: #cce5ff;
+  color: #004085;
+}
+
+.status-select.delivered {
+  background-color: #d1ecf1;
+  color: #0c5460;
+}
+
+.status-select.cancelled {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+/* Loading and error states */
+.loading-container, .error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  text-align: center;
+}
+
+.loading-spinner {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #3498db;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  margin-bottom: 15px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.error-icon {
+  background-color: #f8d7da;
+  color: #721c24;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 15px;
+}
+
+.retry-btn {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 15px;
+}
+
+.retry-btn:hover {
+  background-color: #0069d9;
+}
 /* End order */
 
 /*Supplier*/
@@ -1066,6 +1152,188 @@
 
 /* End AdminProfile */
 
+/* ApprovePayment.css */
+
+.grid-container {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  grid-template-rows: 60px 1fr;
+  height: 100vh;
+}
+
+.order-page {
+  grid-column: 2;
+  grid-row: 2;
+  padding: 2rem;
+  background-color: #f5f7fa;
+}
+
+.order-page h1 {
+  color: #2c3e50;
+  margin-bottom: 1.5rem;
+  font-size: 1.8rem;
+}
+
+.search-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 1rem;
+  transition: border-color 0.3s;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #3498db;
+  box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+}
+
+.order-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.order-table th {
+  background-color: #3498db;
+  color: white;
+  padding: 1rem;
+  text-align: left;
+  font-weight: 500;
+}
+
+.order-table td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #eee;
+  vertical-align: middle;
+}
+
+.order-table tr:last-child td {
+  border-bottom: none;
+}
+
+.order-table tr:hover {
+  background-color: #f8f9fa;
+}
+
+.status-select {
+  padding: 0.5rem;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.status-select.pending {
+  background-color: #fff3cd;
+  border-color: #ffeeba;
+}
+
+.status-select.approved {
+  background-color: #d4edda;
+  border-color: #c3e6cb;
+}
+
+.status-select.rejected {
+  background-color: #f8d7da;
+  border-color: #f5c6cb;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.approve-btn, .reject-btn {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.approve-btn {
+  background-color: #28a745;
+  color: white;
+}
+
+.approve-btn:hover {
+  background-color: #218838;
+}
+
+.reject-btn {
+  background-color: #dc3545;
+  color: white;
+}
+
+.reject-btn:hover {
+  background-color: #c82333;
+}
+
+/* Receipt link styling */
+.order-table a {
+  color: #3498db;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.order-table a:hover {
+  color: #2874a6;
+  text-decoration: underline;
+}
+
+/* Loading and error states */
+.loading-state {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  color: #7f8c8d;
+}
+
+.error-state {
+  color: #e74c3c;
+  padding: 1rem;
+  background-color: #fadbd8;
+  border-radius: 4px;
+  margin-top: 1rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .grid-container {
+    grid-template-columns: 1fr;
+  }
+  
+  .order-page {
+    grid-column: 1;
+    padding: 1rem;
+  }
+  
+  .order-table {
+    display: block;
+    overflow-x: auto;
+  }
+  
+  .action-buttons {
+    flex-direction: column;
+  }
+  
+  .approve-btn, .reject-btn {
+    width: 100%;
+  }
+}
+
+
 /* Medium <= 992px */
 
 @media screen and (max-width: 992px) {
@@ -1150,4 +1418,64 @@
   .header-right {
     gap: 15px; /* Reduce gap on smaller screens */
   }
+}
+
+/* Add Material Section */
+.add-material-btn {
+  background-color: #4e8cff;
+  color: white;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-bottom: 10px;
+  font-size: 14px;
+  transition: background-color 0.3s;
+}
+
+.add-material-btn:hover {
+  background-color: #3a7bd5;
+}
+
+.material-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+  align-items: center;
+}
+
+.material-row select,
+.material-row input {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid #4e8cff;
+  border-radius: 4px;
+  background-color: #1a1f2b;
+  color: white;
+  font-size: 14px;
+}
+
+.material-row select:focus,
+.material-row input:focus {
+  outline: none;
+  border-color: #6ea8fe;
+  box-shadow: 0 0 5px rgba(78, 140, 255, 0.7);
+}
+
+.remove-material-btn {
+  background-color: #ff4d4d;
+  color: white;
+  border: none;
+  width: 30px;
+  height: 30px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.3s;
+}
+
+.remove-material-btn:hover {
+  background-color: #e60000;
 }

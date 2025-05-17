@@ -71,7 +71,7 @@ const NavBar = () => {
         {user && (
           <button 
             className="my-orders-button"
-            onClick={() => navigate("/customerorder")}
+            onClick={() => navigate("/customerorders")}
           >
             My Orders
           </button>

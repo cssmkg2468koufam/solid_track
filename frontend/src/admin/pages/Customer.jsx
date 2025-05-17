@@ -92,7 +92,6 @@ const Customers = () => {
       </div>
 
       <div className="table-section">
-         (
           <table className="custom-table">
             <thead>
               <tr>
@@ -126,7 +125,6 @@ const Customers = () => {
               )}
             </tbody>
           </table>
-        )
       </div>
     </div>
     </div>

@@ -190,14 +190,14 @@ const Cart = () => {
 
     // Remove items from cart
     const removePromises = selectedItems.map(item =>
-  fetch(`http://localhost:5001/routes/cartRoutes/delete/${item.id}`, {
-    method: 'DELETE',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
-    }
-  })
-);
+      fetch(`http://localhost:5001/routes/cartRoutes/delete/${item.id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      })
+    );
 
     await Promise.all(removePromises);
 

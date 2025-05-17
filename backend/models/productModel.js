@@ -32,6 +32,25 @@ const createProduct = async (productName, description, quantity, price, status, 
   }
 }
 
+const addMaterialToProduct = async (product_id, material_id, quantity_required, unit) => {
+  const query = `
+    INSERT INTO product_raw_materials 
+    (product_id, material_id, quantity_required, unit) 
+    VALUES (?, ?, ?, ?)
+  `;
+  try {
+    const [result] = await pool.query(query, [
+      product_id,
+      material_id,
+      quantity_required,
+      unit
+    ]);
+    return result.insertId;
+  } catch (error) {
+    throw error;
+  }
+};
+
 const getProductsByCategory = async (category) => {
   const query = `
     SELECT * FROM products 
@@ -120,4 +139,4 @@ const getAllProductById = async (id) => {
   }
 };
 
-module.exports = {getAll, createProduct, getProductsByCategory, getProductById, editProduct, deleteProduct, getAllProductById, getAllProductsByCategory};
+module.exports = {getAll, createProduct, getProductsByCategory, getProductById, editProduct, deleteProduct, getAllProductById, getAllProductsByCategory, addMaterialToProduct};
