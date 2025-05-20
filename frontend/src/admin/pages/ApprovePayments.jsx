@@ -205,6 +205,7 @@ const ApprovePayment = () => {
   className={`status-select ${(p.status || 'pending').toLowerCase()}`}
 >
   <option value="pending">Pending</option>
+  <option value="pending-pay">Pending-pay</option>
   <option value="paid">Paid</option>
   <option value="rejected">Rejected</option>
 </select>
