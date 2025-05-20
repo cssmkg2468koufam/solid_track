@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import './Register.css';
 import google_icon from '../../assets/google_icon.png'; 
+import { useNavigate } from 'react-router-dom';
 
 const Register = () => {
   const [fullName, setFullName] = useState('');
@@ -19,6 +20,7 @@ const Register = () => {
     number: false,
     specialChar: false,
   });
+const navigate = useNavigate();
   const validatePassword = (password) => {
     const errors = {
       length: password.length >= 8,
@@ -92,6 +94,7 @@ const Register = () => {
       }
 
       setSuccess("Registration successful! Please login to continue.");
+      navigate('/login');
     } catch (err) {
       setError(err.response?.data?.message || "Registration failed. Try again.");
     }
