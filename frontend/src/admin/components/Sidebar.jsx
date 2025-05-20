@@ -57,6 +57,11 @@ const Sidebar = () => {
                     <BsPeopleFill className='icon'/> Suppliers
                 </Link>
             </li>
+            <li className='sidebar-list-item'>
+                <Link to="/reports-admin">
+                    <BsListCheck className='icon'/> Reports
+                </Link>
+            </li>
         </ul>
     </aside>
   )

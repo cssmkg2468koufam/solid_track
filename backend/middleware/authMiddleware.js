@@ -1,22 +1,36 @@
-const jwt = require("jsonwebtoken");
+const jwt = require('jsonwebtoken');
+const pool = require('../config/db');
 
-const protect = (req, res, next) => {
-    const token = req.header("Authorization")?.replace("Bearer ", "");
+const protect = async (req, res, next) => {
+  let token;
 
-    console.log("Token from header:", token);
-
-    if (!token) {
-        return res.status(401).json({ error: "Access denied. No token provided" });
-    }
-
+  // Check for token in Authorization header
+  if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
     try {
-        const decoded = jwt.verify(token, "your_jwt_secret");
-        req.user = decoded;
-        console.log("Authenticated user:", req.user);
-        next();
+      // Extract token from header
+      token = req.headers.authorization.split(' ')[1];
+
+      // Verify token
+      const decoded = jwt.verify(token, 'your_jwt_secret');
+
+      // Add user data to request object
+      req.user = {
+        id: decoded.id,
+        email: decoded.email,
+        role: decoded.role
+      };
+
+      console.log('User authenticated:', req.user);
+      next();
     } catch (error) {
-        res.status(400).json({ error: "Invalid token" });
+      console.error('Authentication error:', error);
+      res.status(401).json({ error: 'Not authorized, token failed' });
     }
+  }
+
+  if (!token) {
+    res.status(401).json({ error: 'Not authorized, no token' });
+  }
 };
 
 module.exports = { protect };

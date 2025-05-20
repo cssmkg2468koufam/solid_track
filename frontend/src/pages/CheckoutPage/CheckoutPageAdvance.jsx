@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { loadStripe } from '@stripe/stripe-js';
@@ -5,10 +6,9 @@ import './CheckoutPage.css';
 
 const stripePromise = loadStripe('pk_test_51RNVXHF2XYRh3d2iLEcpEx2QodkbOO76ENgN6RffgmKp90kgpnXvSt0BInWFcBfXfivtNXquLFXO95emR40wedBV005zYzTaG4');
 
-
-const CheckoutPage = () => {
+const CheckoutPageAdvance = () => {
   const { state } = useLocation();
-  const { order_id, total } = state || {};
+  const { order_id, remain_balance } = state || {};
   const [selectedOption, setSelectedOption] = useState(null);
   const [receiptFile, setReceiptFile] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -16,10 +16,8 @@ const CheckoutPage = () => {
   const [errorMessage, setErrorMessage] = useState('');
   const navigate = useNavigate();
 
-   const advance = total * 0.3;
-  const balance = total - advance;
-
-  if (!order_id || !total) {
+  // Validate and redirect if necessary parameters are missing
+  if (!order_id || !remain_balance) {
     navigate('/customerorders');
     return null;
   }
@@ -47,7 +45,7 @@ const CheckoutPage = () => {
       const formData = new FormData();
       formData.append('order_id', order_id);
       formData.append('customer_id', customer_id);
-      formData.append('amount', total);
+      formData.append('amount', remain_balance);
       formData.append('payment_method', 'bank_transfer');
       formData.append('receipt', receiptFile);
 
@@ -68,6 +66,9 @@ const CheckoutPage = () => {
       setUploadSuccess(true);
       setReceiptFile(null);
 
+      // Update order status to 'paid' after successful payment
+      await updateOrderStatus(order_id, 'paid');
+
       setTimeout(() => {
         navigate(`/invoice/${order_id}`);
       }, 3000);
@@ -80,50 +81,33 @@ const CheckoutPage = () => {
     }
   };
 
-  const handleAdvancePayment = async () => {
-    setIsSubmitting(true);
-    setErrorMessage('');
-
+  const updateOrderStatus = async (orderId, status) => {
     try {
-      const stripe = await stripePromise;
-
-      const response = await fetch(
-        'http://localhost:5001/routes/paymentRoutes/create-advance-checkout-session',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            order_id,
-            amount: advance* 100,
-            remain_balance: balance * 100,
-           
-          }),
-        }
-      );
-      const data = await response.json();
-      if (!response.ok || !data.success) {
-        throw new Error(data.error || 'Payment processing failed');
-      }
-      const result = await stripe.redirectToCheckout({
-        sessionId: data.sessionId,
+      const token = localStorage.getItem('token');
+      const response = await fetch('http://localhost:5001/routes/paymentRoutes/update-order-status', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          order_id: orderId,
+          status: status
+        })
       });
-      if (result.error) {
-        throw new Error(result.error.message);
+
+      if (!response.ok) {
+        throw new Error('Failed to update order status');
       }
     } catch (error) {
-      console.error('Error processing payment:', error);
-      setErrorMessage(error.message || 'Payment processing failed');
-    } finally {
-      setIsSubmitting(false);
+      console.error('Error updating order status:', error);
     }
   };
+  
   const handleStripePayment = async () => {
     setIsSubmitting(true);
     setErrorMessage('');
     
-
     try {
       const stripe = await stripePromise;
 
@@ -136,8 +120,7 @@ const CheckoutPage = () => {
           },
           body: JSON.stringify({
             order_id,
-        amount: total * 100,
-        
+            amount: Math.round(remain_balance )
           }),
         }
       );
@@ -156,23 +139,20 @@ const CheckoutPage = () => {
         throw new Error(result.error.message);
       }
     } catch (error) {
-      console.error('Error processing payment advanced:', error);
+      console.error('Error processing payment:', error);
       setErrorMessage(error.message || 'Payment processing failed');
     } finally {
       setIsSubmitting(false);
     }
   };
-
- 
+  const remainingBalance = remain_balance/100;
 
   return (
     <div className="checkout-container">
-      <h1>Checkout</h1>
+      <h1>Complete Your Payment</h1>
       <div className="order-summary">
         <h2>Order #{order_id}</h2>
-        <p>Total Amount: Rs. {total.toLocaleString()}</p>
-        <p>Advance Payment: Rs. {advance.toLocaleString()}</p>
-        <p>Balance Payment: Rs. {balance.toLocaleString()} (pay after arrange the order)</p>
+        <p className="remaining-balance">Remaining Balance: Rs. {remainingBalance.toLocaleString()}</p>
       </div>
 
       {uploadSuccess && (
@@ -215,7 +195,7 @@ const CheckoutPage = () => {
               onChange={() => setSelectedOption('online')}
               disabled={isSubmitting}
             />
-            <label htmlFor="online-payment">Online Payment </label>
+            <label htmlFor="online-payment">Online Payment</label>
           </div>
 
           {selectedOption === 'upload' && (
@@ -244,31 +224,25 @@ const CheckoutPage = () => {
           )}
 
           {selectedOption === 'online' && (
-  <div className="stripe-payment">
-    <p>Select Payment Amount:</p>
-    <div className="payment-choice-buttons">
-      <button 
-        className={`payment-btn ${selectedOption === 'advance' ? 'active' : ''}`} 
-        onClick={ handleAdvancePayment} 
-        disabled={isSubmitting}
-      >
-        Pay Advance (Rs. {advance.toLocaleString()})
-      </button>
-      <button 
-        className={`payment-btn ${selectedOption === 'full' ? 'active' : ''}`} 
-        onClick={ handleStripePayment} 
-        disabled={isSubmitting}
-      >
-        Pay Full (Rs. {total.toLocaleString()})
-      </button>
-    </div>
-  </div>
-)}
-
+            <div className="stripe-payment">
+              <button 
+                className="payment-btn active" 
+                onClick={handleStripePayment} 
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? (
+                  <>
+                    <span className="spinner"></span>
+                    Processing...
+                  </>
+                ) : `Pay Remaining Balance (Rs. ${remainingBalance.toLocaleString()})`}
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>
   );
 };
 
-export default CheckoutPage;
+export default CheckoutPageAdvance;

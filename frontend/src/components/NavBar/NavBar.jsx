@@ -76,6 +76,14 @@ const NavBar = () => {
             My Orders
           </button>
         )}
+        {user && (
+          <button
+          className="my-payments-button"
+          onClick={() => navigate("/mypayments")}
+          >
+            My Payments
+          </button>
+        )}
         <div className="navbar-cart-icon">
           <img src={basket_icon} alt="Cart" onClick={handleCart}/>
           <div className="dot"></div>

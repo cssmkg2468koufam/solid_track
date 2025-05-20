@@ -18,9 +18,14 @@ import Products from './admin/pages/Products'
 import Supplier from './admin/pages/Supplier'
 import AdminProfile from './admin/pages/AdminProfile' // Import the Admin Profile component
 import CheckoutPage from './pages/CheckoutPage/CheckoutPage';
+import CheckoutPageAdvance from './pages/CheckoutPage/CheckoutPageAdvance';
 import CustomerOrder from './pages/CustomerOrder/CustomerOrder';
 import ApprovePayments from './admin/pages/ApprovePayments' // Import the Admin App component
 import InvoicePage from './pages/Invoice/InvoicePage'; // Import the InvoicePage component
+import Success from './pages/Invoice/Success';
+import Reports from './admin/pages/Reports'; // Import the Reports component
+import SalesReport from './admin/pages/SalesReport'; // Import the SalesReport component
+import OrderReports from './admin/pages/OrderReports'; // Import the OrderReports component
 
 
 const App = () => {
@@ -41,6 +46,11 @@ const App = () => {
           <Route path='/adminprofile-admin' element={null} /> {/* Admin Profile component */}
           <Route path='/checkoutpage' element={null} /> {/* Admin Profile component */}
           <Route path='/approve-payments-admin' element={null} /> {/* Admin Profile component */}
+          <Route path='/invoice/:orderId' element={null} /> {/* Admin Profile component */}
+          <Route path='/reports-admin' element={null} /> {/* Admin Profile component */}
+          <Route path="/salesreport" element={<SalesReport />} />
+          <Route path="/reports-orders" element={<null/>} />
+          
           <Route path='*' element={<NavBar />} /> 
           
         </Routes>
@@ -63,9 +73,14 @@ const App = () => {
             <Route path='/approve-payments-admin' element={<ApprovePayments />} /> {/* Admin App component */}
             <Route path='/supplier-admin' element={<Supplier />} /> {/* Admin App component */}
             <Route path='/adminprofile-admin' element={<AdminProfile />} /> {/* Admin Profile component */}
-            <Route path='//checkout' element={<CheckoutPage />} />
+            <Route path='/checkout' element={<CheckoutPage />} />
+            <Route path='/checkout-advance' element={<CheckoutPageAdvance />} />
             <Route path='/customerorders' element={<CustomerOrder />} />
             <Route path="/invoice/:orderId" element={<InvoicePage />} />
+            <Route path="payment-success" element={<Success />} />
+            <Route path="/reports-admin" element={<Reports />} /> {/* Admin App component */}
+            <Route path="/salesreport" element={<SalesReport />} />
+            <Route path="/reports-orders" element={<OrderReports />} />
 
           </Routes>
           
@@ -83,6 +98,10 @@ const App = () => {
             <Route path="/adminprofile-admin" element={<null />} />
             <Route path="/checkoutpage" element={<null />} />
             <Route path="/approve-payments-admin" element={<null />} />
+            <Route path='/invoice/:orderId' element={null} /> {/* Admin Profile component */}
+            <Route path='/reports-admin' element={null} /> 
+            <Route path="/salesreport" element={null} />
+            <Route path="/reports-orders" element={<null/>} />
             <Route path='*' element={<Footer />} />
           </Routes>
         </div>

@@ -4,14 +4,13 @@ import './Cart.css';
 
 const Cart = () => {
   const [cartItems, setCartItems] = useState([]);
-  const [selectedItems, setSelectedItems] = useState([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showLoginPopup, setShowLoginPopup] = useState(false);
   const [showOrderConfirmation, setShowOrderConfirmation] = useState(false);
   const [deliveryDate, setDeliveryDate] = useState('');
-  const [location, setLocation] = useState('');
+  const [location, setLocation] = useState(''); // Added missing location state
   const [orderMessage, setOrderMessage] = useState('');
   const navigate = useNavigate();
 
@@ -49,12 +48,11 @@ const Cart = () => {
           id: item.id || '', 
           productId: item.product_id || '',
           name: item.product_name || 'Unknown Product',
-          totalprice: Number(item.price) || 0,
           price: Number(item.price_of_one_product) || 0,
-          quantity: Number(item.quantity) || 1,
           image: item.image_url || '',
           customer_id: item.customer_id,
-          selected: false
+          selected: false,
+          quantity: 1 // Default quantity set to 1, ignoring any database quantity
         }));
         
         setCartItems(validatedItems);
@@ -79,18 +77,28 @@ const Cart = () => {
   const handleRemoveItem = async (id) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5001/routes/cartRoutes/delete`, {
+      
+      // Fixed: Use correct endpoint URL matching the route in CartRoutes.js
+      const response = await fetch(`http://localhost:5001/routes/cartRoutes/delete/${id}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ cartItem_id: id })
+        }
       });
 
       if (!response.ok) {
         throw new Error('Failed to remove item');
       }
+
+      // Optimistically update the UI before waiting for response
+    setCartItems(prevItems => prevItems.filter(item => item.id !== id));
+    
+    // Parse the response to check for success message
+    const data = await response.json();
+    if (data.message !== 'Cart item deleted successfully') {
+      throw new Error('Item removal not confirmed');
+    }
 
       const updatedItems = cartItems.filter(item => item.id !== id);
       setCartItems(updatedItems);
@@ -100,32 +108,40 @@ const Cart = () => {
     }
   };
 
-  const handleQuantityChange = async (id, newQuantity) => {
-    if (newQuantity < 1) return;
+  
 
+  const handleClearCart = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5001/routes/cartRoutes/${id}`, {
-        method: 'PUT',
+      const response = await fetch(`http://localhost:5001/routes/cartRoutes/clear`, {
+        method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ quantity: newQuantity })
+        }
       });
 
       if (!response.ok) {
-        throw new Error('Failed to update quantity');
+        throw new Error('Failed to clear cart');
       }
 
-      const updatedItems = cartItems.map(item => 
-        item.id === id ? { ...item, quantity: newQuantity } : item
-      );
-      setCartItems(updatedItems);
+      setCartItems([]);
     } catch (err) {
-      console.error('Error updating quantity:', err);
+      console.error('Error clearing cart:', err);
       setError(err.message);
     }
+  };
+
+  const handleQuantityChange = (id, newQuantity) => {
+    if (newQuantity < 1){
+      alert("Quantity cannot be less than 1");
+      return; // Added return to prevent updating with invalid quantity
+    }
+
+    const updatedItems = cartItems.map(item => 
+      item.id === id ? { ...item, quantity: newQuantity } : item
+    );
+    setCartItems(updatedItems);
   };
 
   const toggleItemSelection = (id) => {
@@ -153,70 +169,68 @@ const Cart = () => {
   };
 
   const handleConfirmOrder = async () => {
-  if (!deliveryDate || !location) {
-    setOrderMessage('Please fill in all fields');
-    setTimeout(() => setOrderMessage(''), 3000);
-    return;
-  }
-
-  try {
-    const token = localStorage.getItem("token");
-    const customerData = JSON.parse(localStorage.getItem("customer"));
-    const selectedItems = cartItems.filter(item => item.selected);
-
-    const orderPayload = {
-      customer_id: customerData.customer_id,
-      delivery_date: deliveryDate,
-      location: location,
-      items: selectedItems.map(item => ({
-        product_id: item.productId,
-        quantity: item.quantity,
-        total: item.price * item.quantity
-      }))
-    };
-
-    const response = await fetch('http://localhost:5001/routes/orderRoutes/addFullOrder', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify(orderPayload)
-    });
-
-    if (!response.ok) {
-      throw new Error('Order failed');
+    if (!deliveryDate) { // Modified to check only deliveryDate since location input is commented out
+      setOrderMessage('Please fill in all fields');
+      setTimeout(() => setOrderMessage(''), 3000);
+      return;
     }
 
-    // Remove items from cart
-    const removePromises = selectedItems.map(item =>
-      fetch(`http://localhost:5001/routes/cartRoutes/delete/${item.id}`, {
-        method: 'DELETE',
+    try {
+      const token = localStorage.getItem("token");
+      const customerData = JSON.parse(localStorage.getItem("customer"));
+      const selectedItems = cartItems.filter(item => item.selected);
+
+      const orderPayload = {
+        customer_id: customerData.customer_id,
+        delivery_date: deliveryDate,
+        location: location || "Default Location", // Added fallback for location
+        items: selectedItems.map(item => ({
+          product_id: item.productId,
+          quantity: item.quantity,
+          total: item.price * item.quantity
+        }))
+      };
+
+      const response = await fetch('http://localhost:5001/routes/orderRoutes/addFullOrder', {
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
-        }
-      })
-    );
+        },
+        body: JSON.stringify(orderPayload)
+      });
 
-    await Promise.all(removePromises);
+      if (!response.ok) {
+        throw new Error('Order failed');
+      }
 
-    setShowOrderConfirmation(false);
-    setOrderMessage('Order placed successfully. Awaiting admin approval.');
-    setCartItems(cartItems.filter(item => !item.selected));
-    setTimeout(() => setOrderMessage(''), 3000);
-  } catch (error) {
-    console.error('Order error:', error);
-    setOrderMessage('Failed to place order. Please try again.');
-    setTimeout(() => setOrderMessage(''), 3000);
-  }
-};
+      // Fixed: Use correct endpoint URL for removing cart items
+      const removePromises = selectedItems.map(item =>
+        fetch(`http://localhost:5001/routes/cartRoutes/delete/${item.id}`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          }
+        })
+      );
 
+      await Promise.all(removePromises);
+
+      setShowOrderConfirmation(false);
+      setOrderMessage('Order placed successfully. Awaiting admin approval.');
+      setCartItems(cartItems.filter(item => !item.selected));
+      setTimeout(() => setOrderMessage(''), 3000);
+    } catch (error) {
+      console.error('Order error:', error);
+      setOrderMessage('Failed to place order. Please try again.');
+      setTimeout(() => setOrderMessage(''), 3000);
+    }
+  };
 
   const handleCloseOrderConfirmation = () => {
     setShowOrderConfirmation(false);
     setDeliveryDate('');
-    setLocation('');
   };
 
   const handleCloseLoginPopup = () => {
@@ -268,7 +282,7 @@ const Cart = () => {
               />
             </div>
             
-            <div className="form-group">
+            {/* <div className="form-group">
               <label htmlFor="location">Delivery Location:</label>
               <input
                 type="text"
@@ -278,7 +292,7 @@ const Cart = () => {
                 placeholder="Enter your delivery address"
                 required
               />
-            </div>
+            </div> */}
             
             <div className="order-summary">
               <h4>Order Summary</h4>
@@ -328,34 +342,36 @@ const Cart = () => {
                   />
                 </div>
                 <div className="item-image">
-                  <img src={item.image} alt={item.name} />
-                </div>
+  <img 
+    src={item.image} 
+    alt={item.name}
+    onError={(e) => {
+      e.target.onerror = null;
+      e.target.src = '/path/to/placeholder-image.jpg';
+    }}
+  />
+</div>
                 <div className="item-details">
                   <h3>{item.name}</h3>
                   <div className="item-price">Rs. {item.price?.toLocaleString() || '0'}</div>
                   <div className="item-quantity">
-                    <button 
-                      onClick={() => handleQuantityChange(item.id, item.quantity - 1)}
-                      disabled={item.quantity <= 1}
-                    >
-                      -
-                    </button>
-                    <span>{item.quantity}</span>
-                    <button 
-                      onClick={() => handleQuantityChange(item.id, item.quantity + 1)}
-                    >
-                      +
-                    </button>
-                  </div>
-                  <div className="item-total">
-                    Rs. {(item.price * item.quantity)?.toLocaleString() || '0'}
+                    <label>Quantity:</label>
+                    <input 
+                      type="number"
+                      value={item.quantity}
+                      onChange={(e) => handleQuantityChange(item.id, parseInt(e.target.value) || 0)}
+                      min="1"
+                    />
                   </div>
                   <button 
-                    onClick={() => handleRemoveItem(item.id)}
                     className="remove-item"
+                    onClick={() => handleRemoveItem(item.id)}
                   >
                     Remove
                   </button>
+                </div>
+                <div className="item-total">
+                  Rs. {(item.price * item.quantity).toLocaleString()}
                 </div>
               </div>
             ))}

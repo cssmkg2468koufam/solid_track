@@ -291,43 +291,20 @@ const ProductDetails = () => {
             )}
           </div>
           
-          <div className="availability-section">
-            <span className={`availability-status ${product.quantity > 0 ? 'in-stock' : 'out-of-stock'}`}>
-              {product.quantity > 0 ? 'In Stock' : 'Out of Stock'}
-            </span>
-            {product.quantity > 0 && (
-              <span className="stock-quantity">Only {product.quantity} left</span>
-            )}
+
+          <div className="product-details-section">
+        <div className="details-tabs">
+          <button className="tab-active">Description</button>
+
+        </div>
+        
+        <div className="tab-content">
+          <div className="description-content">
+            <h3>Product Description</h3>
+            <p>{product.description || 'No detailed description available.'}</p>
           </div>
-          
-          <div className="quantity-selector">
-            <label htmlFor="quantity">Quantity:</label>
-            <div className="quantity-controls">
-              <button 
-                className="quantity-btn" 
-                onClick={() => handleQuantityChange(quantity - 1)}
-                disabled={quantity <= 1}
-              >
-                -
-              </button>
-              <input
-                type="number"
-                id="quantity"
-                min="1"
-                max={product.quantity}
-                value={quantity}
-                onChange={(e) => handleQuantityChange(parseInt(e.target.value) || 1)}
-                className="quantity-input"
-              />
-              <button 
-                className="quantity-btn" 
-                onClick={() => handleQuantityChange(quantity + 1)}
-                disabled={quantity >= product.quantity}
-              >
-                +
-              </button>
-            </div>
-          </div>
+        </div>
+      </div>
 
           <div className="product-actions">
             <button 
@@ -351,54 +328,6 @@ const ProductDetails = () => {
             </div>
           )}
           
-        </div>
-      </div>
-      
-      <div className="product-details-section">
-        <div className="details-tabs">
-          <button className="tab-active">Description</button>
-
-        </div>
-        
-        <div className="tab-content">
-          <div className="description-content">
-            <h3>Product Description</h3>
-            <p>{product.description || 'No detailed description available.'}</p>
-          </div>
-          
-          <div className="specifications-content">
-            <h3>Detailed Specifications</h3>
-            <div className="specs-grid">
-              <div className="spec-row">
-                <span className="spec-name">Category</span>
-                <span className="spec-value">{product.category || 'N/A'}</span>
-              </div>
-              {product.dimensions && (
-                <div className="spec-row">
-                  <span className="spec-name">Dimensions</span>
-                  <span className="spec-value">{product.dimensions}</span>
-                </div>
-              )}
-              {product.weight && (
-                <div className="spec-row">
-                  <span className="spec-name">Weight</span>
-                  <span className="spec-value">{product.weight}</span>
-                </div>
-              )}
-              {product.color && (
-                <div className="spec-row">
-                  <span className="spec-name">Color</span>
-                  <span className="spec-value">{product.color}</span>
-                </div>
-              )}
-              {product.material && (
-                <div className="spec-row">
-                  <span className="spec-name">Material</span>
-                  <span className="spec-value">{product.material}</span>
-                </div>
-              )}
-            </div>
-          </div>
         </div>
       </div>
     </div>

@@ -31,6 +31,20 @@
   margin-right: 1rem;
 }
 
+.payment-btn {
+  background-color: #15053f;
+  color: rgb(255, 255, 255);
+  padding: 0.7rem 1.5rem;
+  border: 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 15px;
+  margin-top: 20px;
+}
+.payment-btn:hover {
+  background-color: rgb(25, 9, 78);
+}
+
 .upload-form {
   margin-top: 1rem;
   padding: 1.5rem;

@@ -1,5 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { FaTrash } from 'react-icons/fa';
+import { jsPDF } from 'jspdf';
+import autoTable from 'jspdf-autotable';
+import { DatePicker } from 'antd';
+import moment from 'moment';
 import './AppAdmin.css';
 import Sidebar from '../components/Sidebar';
 import Header from '../components/Header';
@@ -9,6 +13,9 @@ const Orders = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [reportModalVisible, setReportModalVisible] = useState(false);
+  const [dateRange, setDateRange] = useState([null, null]);
+  const [reportLoading, setReportLoading] = useState(false);
 
   const fetchOrders = async () => {
     try {
@@ -39,30 +46,67 @@ const Orders = () => {
     fetchOrders();
   }, []);
 
-  const handleStatusUpdate = async (orderId, newStatus) => {
-    try {
 
-  
+  const handleStatusUpdate = async (orderId, newStatus) => {
+  try {
+    // Check inventory for both "approved" and "arranged" statuses
+    if (newStatus === "approved" || newStatus === "arranged") {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5001/routes/orderRoutes/updateStatus/${orderId}`, {
+      const inventoryCheckResponse = await fetch(
+        `http://localhost:5001/routes/orderRoutes/checkInventory/${orderId}`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+        }
+      );
+
+      if (!inventoryCheckResponse.ok) {
+        const errorData = await inventoryCheckResponse.json();
+        throw new Error(errorData.error || 'Failed to check inventory');
+      }
+
+      const inventoryCheck = await inventoryCheckResponse.json();
+      
+      if (!inventoryCheck.hasEnoughMaterials) {
+        // Enhanced error message showing which materials are insufficient
+        const missingMaterials = inventoryCheck.insufficientMaterials
+          .map(m => `${m.material_name} (Need: ${m.required}, Have: ${m.available})`)
+          .join('\n');
+        
+        alert(`Insufficient materials for this order:\n${missingMaterials}`);
+        return;
+      }
+    }
+
+    // Rest of the status update logic remains the same...
+    const token = localStorage.getItem('token');
+    const response = await fetch(
+      `http://localhost:5001/routes/orderRoutes/updateStatus/${orderId}`,
+      {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({ status: newStatus })
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to update status');
       }
+    );
 
-      fetchOrders();
-    } catch (err) {
-      console.error('Error updating status:', err);
-      setError(err.message);
+    if (!response.ok) {
+      throw new Error('Failed to update status');
     }
-  };
+
+    fetchOrders();
+  } catch (err) {
+    console.error('Error updating status:', err);
+    setError(err.message);
+    // Show error in UI instead of just console
+    alert(`Error: ${err.message}`);
+  }
+};
 
   const handleDelete = async (orderId) => {
     if (window.confirm('Are you sure you want to delete this order?')) {
@@ -137,7 +181,46 @@ const Orders = () => {
         <div className="header">
           <h1>Orders</h1>
           <div className="header-actions">
-            <button className="export-btn">Export</button>
+            {/* <button 
+  className="export-btn" 
+  onClick={() => setReportModalVisible(true)}
+>
+  Export Report
+</button> */}
+
+{/* Add this modal at the bottom of your component, before the final closing div */}
+{reportModalVisible && (
+  <div className="modal-overlay">
+    <div className="report-modal">
+      <h3>Generate Order Report</h3>
+      <p>Select date range for the report:</p>
+      
+      <DatePicker.RangePicker
+        style={{ width: '100%', marginBottom: '20px' }}
+        value={dateRange}
+        onChange={setDateRange}
+        disabledDate={current => current && current > moment().endOf('day')}
+      />
+      
+      <div className="modal-actions">
+        <button 
+          className="cancel-btn"
+          onClick={() => setReportModalVisible(false)}
+          disabled={reportLoading}
+        >
+          Cancel
+        </button>
+        <button 
+          className="generate-btn"
+          onClick={handleGenerateReport}
+          disabled={reportLoading}
+        >
+          {reportLoading ? 'Generating...' : 'Generate Report'}
+        </button>
+      </div>
+    </div>
+  </div>
+)}
           </div>
         </div>
 
@@ -155,10 +238,11 @@ const Orders = () => {
           <table className="order-table">
             <thead>
               <tr>
-                <th>Order ID</th>
+                {/* <th>Order ID</th> */}
                 <th>Customer</th>
+                <th>Order Product</th>
                 <th>Delivery Date</th>
-                <th>Location</th>
+                {/* <th>Location</th> */}
                 <th>Total Amount</th>
                 <th>Status</th>
                 <th>Actions</th>
@@ -168,11 +252,25 @@ const Orders = () => {
               {filteredOrders.length > 0 ? (
                 filteredOrders.map((order) => (
                   <tr key={order.order_id}>
-                    <td>#{order.order_id}</td>
+                    {/* <td>#{order.order_id}</td> */}
                     <td>{order.customer_name || `Customer ID: ${order.customer_id}`}</td>
+                    <td>
+  {order.ordered_products?.length > 0 ? (
+    <ul>
+      {order.ordered_products.map((prod, index) => (
+        <li key={index}>
+          {prod.product_name} (x{prod.quantity})
+        </li>
+      ))}
+    </ul>
+  ) : (
+    'No products'
+  )}
+</td>
                     <td>{formatDate(order.delivery_date)}</td>
-                    <td>{order.location}</td>
+                    {/* <td>{order.location}</td> */}
                     <td>Rs. {order.total_amount?.toLocaleString() || '0'}</td>
+
                     <td>
                       <select 
                         value={order.status} 
@@ -183,6 +281,8 @@ const Orders = () => {
                         <option value="approved">Approved</option>
                         <option value="cancelled">Cancelled</option>
                         <option value="arranged">Arranged</option>
+                        <option value="paid">paid</option>
+                        <option value="advanced-paid">advanced-paid</option>
                       </select>
                     </td>
                     <td>

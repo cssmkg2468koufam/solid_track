@@ -13,32 +13,24 @@ const Materials = () => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [newMaterial, setNewMaterial] = useState({
+    material_id: '',
     name: '',
     supplier: '',
     quantity: '',
-    unit: 'cubic_meters',
     price: '',
     purchase_date: '',
     stock: 'In Stock'
   });
+  const [selectedExistingMaterial, setSelectedExistingMaterial] = useState(null);
   const [editingMaterial, setEditingMaterial] = useState({
     material_id: '',
     name: '',
     supplier: '',
     quantity: '',
-    unit: 'cubic_meters',
     price: ''
   });
 
   const navigate = useNavigate();
-
-  const unitOptions = [
-    { value: 'cubic_meters', label: 'Cubic Meters (m³)' },
-    { value: 'kg', label: 'Kilograms (kg)' },
-    { value: 'bags', label: 'Bags' },
-    { value: 'pieces', label: 'Pieces' },
-    { value: 'liters', label: 'Liters (L)' }
-  ];
 
   const formatDate = (dateString) => {
     if (!dateString) return '';
@@ -87,19 +79,18 @@ const Materials = () => {
     );
   });
 
-  const formatQuantity = (material) => {
-    if (!material) return '';
-    switch(material.unit) {
-      case 'cubic_meters': return `${material.quantity} m³`;
-      case 'kg': return `${material.quantity} kg`;
-      case 'bags': return `${material.quantity} bags`;
-      case 'liters': return `${material.quantity} L`;
-      default: return material.quantity || '';
-    }
-  };
-
   const handleAddMaterial = () => {
     setShowAddModal(true);
+    setSelectedExistingMaterial(null);
+    setNewMaterial({
+      material_id: '',
+      name: '',
+      supplier: '',
+      quantity: '',
+      price: '',
+      purchase_date: '',
+      stock: 'In Stock'
+    });
   };
 
   const handleExportToExcel = () => {
@@ -116,37 +107,44 @@ const Materials = () => {
       name: material.name,
       supplier: material.supplier,
       quantity: material.quantity,
-      unit: material.unit,
       price: material.price
     });
     setShowEditModal(true);
   };
 
   const handleUpdate = async (e) => {
-    e.preventDefault();
-    try {
-      const res = await fetch(`http://localhost:5001/routes/materialRoutes/update/${editingMaterial.material_id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(editingMaterial)
-      });
+  e.preventDefault();
+  try {
+    const res = await fetch(`http://localhost:5001/routes/materialRoutes/update/${editingMaterial.material_id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: editingMaterial.name,
+        supplier: editingMaterial.supplier,
+        quantity: editingMaterial.quantity,
+        price: editingMaterial.price,
+        purchase_date: new Date().toISOString().split('T')[0] // or get from editingMaterial if available
+      })
+    });
 
-      if (res.ok) {
-        await fetchMaterials();
-        setShowEditModal(false);
-        setEditingMaterial({
-          material_id: '',
-          name: '',
-          supplier: '',
-          quantity: '',
-          unit: 'cubic_meters',
-          price: ''
-        });
-      }
-    } catch (error) {
-      console.error('Error while updating material:', error);
+    if (res.ok) {
+      await fetchMaterials();
+      setShowEditModal(false);
+      setEditingMaterial({
+        material_id: '',
+        name: '',
+        supplier: '',
+        quantity: '',
+        price: ''
+      });
+    } else {
+      const errorData = await res.json();
+      console.error('Update error:', errorData);
     }
-  };
+  } catch (error) {
+    console.error('Error while updating material:', error);
+  }
+};
 
   const handleEditChange = (e) => {
     setEditingMaterial({
@@ -169,7 +167,7 @@ const Materials = () => {
     } catch (error) {
       console.error("Error while deleting material:", error);
     }
-  };  
+  };
 
   const handleChange = (e) => {
     setNewMaterial({
@@ -178,25 +176,47 @@ const Materials = () => {
     });
   };
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  try {
-    // Check if material with this ID exists
-    const existingMaterial = materials.find(m => m.material_id === newMaterial.id);
-    
-    if (existingMaterial) {
-      // Check if supplier is the same
-      if (existingMaterial.supplier === newMaterial.supplier) {
-        // Update existing material's quantity
-        const updatedQuantity = parseFloat(existingMaterial.quantity) + parseFloat(newMaterial.quantity);
-        const res = await fetch(`http://localhost:5001/routes/materialRoutes/update/${existingMaterial.material_id}`, {
+  const handleExistingMaterialSelect = (e) => {
+    const materialId = e.target.value;
+    if (materialId === 'new') {
+      setSelectedExistingMaterial(null);
+      setNewMaterial({
+        material_id: '',
+        name: '',
+        supplier: '',
+        quantity: '',
+        price: '',
+        purchase_date: '',
+        stock: 'In Stock'
+      });
+    } else {
+      const selectedMaterial = materials.find(m => m.material_id === materialId);
+      if (selectedMaterial) {
+        setSelectedExistingMaterial(selectedMaterial);
+        setNewMaterial({
+          ...selectedMaterial,
+          quantity: '',
+          price: selectedMaterial.price, // Keep the existing price as default
+          purchase_date: new Date().toISOString().split('T')[0] // Set current date as default
+        });
+      }
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      if (selectedExistingMaterial) {
+        // Update existing material's quantity and price
+        const updatedQuantity = parseFloat(selectedExistingMaterial.quantity) + parseFloat(newMaterial.quantity);
+        const res = await fetch(`http://localhost:5001/routes/materialRoutes/update/${selectedExistingMaterial.material_id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            ...existingMaterial,
+            ...selectedExistingMaterial,
             quantity: updatedQuantity,
-            price: newMaterial.price, // Update price if needed
-            purchase_date: newMaterial.purchase_date // Update purchase date
+            price: newMaterial.price,
+            purchase_date: newMaterial.purchase_date
           })
         });
         
@@ -204,69 +224,41 @@ const handleSubmit = async (e) => {
           await fetchMaterials();
           setShowAddModal(false);
           setNewMaterial({
+            material_id: '',
             name: '',
             supplier: '',
             quantity: '',
-            unit: 'cubic_meters',
             price: '',
             purchase_date: '',
             stock: 'In Stock'
           });
         }
       } else {
-        // Different supplier - create new material with same ID
+        // Create new material
         const res = await fetch('http://localhost:5001/routes/materialRoutes/create', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            ...newMaterial,
-            material_id: newMaterial.id // Use the same ID
-          })
+          body: JSON.stringify(newMaterial)
         });
 
         if (res.ok) {
           await fetchMaterials();
           setShowAddModal(false);
           setNewMaterial({
+            material_id: '',
             name: '',
             supplier: '',
             quantity: '',
-            unit: 'cubic_meters',
             price: '',
             purchase_date: '',
             stock: 'In Stock'
           });
         }
       }
-    } else {
-      // Create new material with new ID
-      const res = await fetch('http://localhost:5001/routes/materialRoutes/create', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...newMaterial,
-          material_id: newMaterial.id // Use the provided ID
-        })
-      });
-
-      if (res.ok) {
-        await fetchMaterials();
-        setShowAddModal(false);
-        setNewMaterial({
-          name: '',
-          supplier: '',
-          quantity: '',
-          unit: 'cubic_meters',
-          price: '',
-          purchase_date: '',
-          stock: 'In Stock'
-        });
-      }
+    } catch (error) {
+      console.error('Error while adding material:', error);
     }
-  } catch (error) {
-    console.error('Error while adding material:', error);
-  }
-};
+  };
 
   if (loading) {
     return <div className="loading">Loading materials...</div>;
@@ -278,197 +270,262 @@ const handleSubmit = async (e) => {
 
   return (
     <div className="grid-container">
-        <Header />
-        <Sidebar />
-    <div className="materials-page">
-      <div className="header">
-        <h1>Raw Materials</h1>
-        <div className="header-actions">
-          <button className="export-btn" onClick={handleExportToExcel}>Export</button>
-          <button className="details-btn" onClick={handleViewDetails}>Details</button>
-          <button className="add-btn" onClick={handleAddMaterial}>+ New Material</button>
-        </div>
-      </div>
-
-      <div className="search-container">
-        <input
-          type="text"
-          placeholder="Search..."
-          value={searchQuery}
-          onChange={handleSearch}
-          className="search-input"
-        />
-      </div>
-
-      <div className="table-container">
-        <table className="materials-table">
-          <thead>
-            <tr>
-              <th>Material ID</th>
-              <th>Material Name</th>
-              <th>Supplier</th>
-              <th>Quantity</th>
-              <th>Unit</th>
-              <th>Price</th>
-              <th>Purchase Date</th>
-              <th>Stock</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredMaterials.length > 0 ? (
-              filteredMaterials.map((material, index) => (
-                <tr key={index}>
-                  <td>{material?.material_id || ''}</td>
-                  <td>{material?.name || ''}</td>
-                  <td>{material?.supplier || ''}</td>
-                  <td>{material?.quantity || ''}</td>
-                  <td>{material?.unit ? material.unit.replace('_', ' ') : ''}</td>
-                  <td>{material?.price || ''}</td>
-                  <td>{formatDate(material?.purchase_date) || ''}</td>
-                  <td>
-                    <span className={`status-badge ${material?.stock === 'In Stock' ? 'in-stock' : 'low-stock'}`}>
-                      {material?.stock || ''}
-                    </span>
-                  </td>
-                  <td>
-                    <FaEdit className="edit-icon" onClick={() => handleEdit(material)} />
-                    <FaTrash className="delete-icon" onClick={() => handleDelete(material?.material_id)} />
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="9" className="no-data">No materials found</td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
-
-{showAddModal && (
-  <div className="modal-overlay">
-    <div className="modal-content">
-      <h2>Add New Material</h2>
-      <form onSubmit={handleSubmit}>
-        <div className="form-group">
-          <label>Material</label>
-          <select 
-            name="id" 
-            value={newMaterial.id} 
-            onChange={handleChange}
-            required
-          >
-            <option value="">Select existing material or create new</option>
-            {materials.map(material => (
-              <option key={material.material_id} value={material.material_id}>
-                {material.name} ({material.material_id})
-              </option>
-            ))}
-            <option value="new">Create New Material</option>
-          </select>
-        </div>
-        
-        {newMaterial.id === 'new' && (
-          <>
-            <div className="form-group">
-              <label>New Material ID</label>
-              <input 
-                type="text" 
-                name="id" 
-                value={newMaterial.id} 
-                onChange={handleChange} 
-                required 
-              />
-            </div>
-            <div className="form-group">
-              <label>Material Name</label>
-              <input type="text" name="name" value={newMaterial.name} onChange={handleChange} required />
-            </div>
-          </>
-        )}
-        
-        <div className="form-group">
-          <label>Supplier</label>
-          <input type="text" name="supplier" value={newMaterial.supplier} onChange={handleChange} required />
-        </div>
-        <div className="form-group">
-          <label>Quantity</label>
-          <input type="number" name="quantity" value={newMaterial.quantity} onChange={handleChange} min="0" required />
-        </div>
-        <div className="form-group">
-          <label>Unit</label>
-          <select name="unit" value={newMaterial.unit} onChange={handleChange} required>
-            {unitOptions.map(option => (
-              <option key={option.value} value={option.value}>{option.label}</option>
-            ))}
-          </select>
-        </div>
-        <div className="form-group">
-          <label>Price</label>
-          <input type="number" name="price" value={newMaterial.price} onChange={handleChange} min="0" step="0.01" required />
-        </div>
-        <div className="form-group">
-          <label>Purchase Date</label>
-          <input type="date" name="purchase_date" value={newMaterial.purchase_date} onChange={handleChange} required />
-        </div>
-        <div className="form-group">
-          <label>Stock Status</label>
-          <select name="stock" value={newMaterial.stock} onChange={handleChange}>
-            <option value="In Stock">In Stock</option>
-          </select>
-        </div>
-        <div className="modal-actions">
-          <button type="submit" className="save-btn">Save</button>
-          <button type="button" className="cancel-btn" onClick={() => setShowAddModal(false)}>Cancel</button>
-        </div>
-      </form>
-    </div>
-  </div>
-)}
-
-      {showEditModal && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <h2>Edit Material</h2>
-            <form onSubmit={handleUpdate}>
-              <div className="form-group">
-                <label>Material ID</label>
-                <input type="text" value={editingMaterial.material_id} disabled />
-              </div>
-              <div className="form-group">
-                <label>Material Name</label>
-                <input type="text" name="name" value={editingMaterial.name} onChange={handleEditChange} required />
-              </div>
-              <div className="form-group">
-                <label>Supplier</label>
-                <input type="text" name="supplier" value={editingMaterial.supplier} onChange={handleEditChange} required />
-              </div>
-              <div className="form-group">
-                <label>Quantity</label>
-                <input type="number" name="quantity" value={editingMaterial.quantity} onChange={handleEditChange} min="0" required />
-              </div>
-              <div className="form-group">
-                <label>Unit</label>
-                <select name="unit" value={editingMaterial.unit} onChange={handleEditChange} required>
-                  {unitOptions.map(option => (
-                    <option key={option.value} value={option.value}>{option.label}</option>
-                  ))}
-                </select>
-              </div>
-              <div className="form-group">
-                <label>Price</label>
-                <input type="number" name="price" value={editingMaterial.price} onChange={handleEditChange} min="0" step="0.01"  required />
-              </div>
-              <div className="modal-actions">
-                <button type="submit" className="save-btn">Update</button>
-                <button type="button" className="cancel-btn" onClick={() => setShowEditModal(false)}>Cancel</button>
-              </div>
-            </form>
+      <Header />
+      <Sidebar />
+      <div className="materials-page">
+        <div className="header">
+          <h1>Raw Materials</h1>
+          <div className="header-actions">
+            <button className="export-btn" onClick={handleExportToExcel}>Export</button>
+            <button className="details-btn" onClick={handleViewDetails}>Details</button>
+            <button className="add-btn" onClick={handleAddMaterial}>+ Add Material</button>
           </div>
         </div>
-      )}
-    </div>
+
+        <div className="search-container">
+          <input
+            type="text"
+            placeholder="Search..."
+            value={searchQuery}
+            onChange={handleSearch}
+            className="search-input"
+          />
+        </div>
+
+        <div className="table-container">
+          <table className="materials-table">
+            <thead>
+              <tr>
+                <th>Material ID</th>
+                <th>Material Name</th>
+                <th>Supplier</th>
+                <th>Quantity</th>
+                <th>Price</th>
+                <th>Purchase Date</th>
+                <th>Stock</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredMaterials.length > 0 ? (
+                filteredMaterials.map((material, index) => (
+                  <tr key={index}>
+                    <td>{material?.material_id || ''}</td>
+                    <td>{material?.name || ''}</td>
+                    <td>{material?.supplier || ''}</td>
+                    <td>{material?.quantity || ''}</td>
+                    <td>{material?.price || ''}</td>
+                    <td>{formatDate(material?.purchase_date) || ''}</td>
+                    <td>
+                      <span className={`status-badge ${material?.stock === 'In Stock' ? 'in-stock' : 'low-stock'}`}>
+                        {material?.stock || ''}
+                      </span>
+                    </td>
+                    <td>
+                      <FaEdit className="edit-icon" onClick={() => handleEdit(material)} />
+                      <FaTrash className="delete-icon" onClick={() => handleDelete(material?.material_id)} />
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="9" className="no-data">No materials found</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        {showAddModal && (
+          <div className="modal-overlay">
+            <div className="modal-content">
+              <h2>Add Material</h2>
+              <form onSubmit={handleSubmit}>
+                <div className="form-group">
+                  <label>Select Existing Material</label>
+                  <select 
+                    onChange={handleExistingMaterialSelect}
+                    defaultValue="new"
+                  >
+                    <option value="new">Add New Material</option>
+                    {materials.map(material => (
+                      <option key={material.material_id} value={material.material_id}>
+                        {material.name} ({material.material_id})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {selectedExistingMaterial ? (
+                  <>
+                    <div className="form-group">
+                      <label>Material ID</label>
+                      <input 
+                        type="text" 
+                        value={selectedExistingMaterial.material_id} 
+                        readOnly 
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>Material Name</label>
+                      <input 
+                        type="text" 
+                        value={selectedExistingMaterial.name} 
+                        readOnly 
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>Supplier</label>
+                      <input 
+                        type="text" 
+                        value={selectedExistingMaterial.supplier} 
+                        readOnly 
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>Current Quantity</label>
+                      <input 
+                        type="text" 
+                        value={selectedExistingMaterial.quantity} 
+                        readOnly 
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>Additional Quantity</label>
+                      <input 
+                        type="number" 
+                        name="quantity" 
+                        value={newMaterial.quantity} 
+                        onChange={handleChange} 
+                        min="0" 
+                        required 
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>Price (per unit)</label>
+                      <input 
+                        type="number" 
+                        name="price" 
+                        value={newMaterial.price} 
+                        onChange={handleChange} 
+                        min="0" 
+                        step="0.01" 
+                        required 
+                      />
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="form-group">
+                      <label>Material ID</label>
+                      <input 
+                        type="text" 
+                        name="material_id" 
+                        value={newMaterial.material_id} 
+                        onChange={handleChange} 
+                        required 
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>Material Name</label>
+                      <input 
+                        type="text" 
+                        name="name" 
+                        value={newMaterial.name} 
+                        onChange={handleChange} 
+                        required 
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>Supplier</label>
+                      <input 
+                        type="text" 
+                        name="supplier" 
+                        value={newMaterial.supplier} 
+                        onChange={handleChange} 
+                        required 
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>Quantity</label>
+                      <input 
+                        type="number" 
+                        name="quantity" 
+                        value={newMaterial.quantity} 
+                        onChange={handleChange} 
+                        min="0" 
+                        required 
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>Price (per unit)</label>
+                      <input 
+                        type="number" 
+                        name="price" 
+                        value={newMaterial.price} 
+                        onChange={handleChange} 
+                        min="0" 
+                        step="0.01" 
+                        required 
+                      />
+                    </div>
+                  </>
+                )}
+
+                <div className="form-group">
+                  <label>Purchase Date</label>
+                  <input 
+                    type="date" 
+                    name="purchase_date" 
+                    value={newMaterial.purchase_date} 
+                    onChange={handleChange} 
+                    required 
+                  />
+                </div>
+
+                <div className="modal-actions">
+                  <button type="submit" className="save-btn">Save</button>
+                  <button type="button" className="cancel-btn" onClick={() => setShowAddModal(false)}>Cancel</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {showEditModal && (
+          <div className="modal-overlay">
+            <div className="modal-content">
+              <h2>Edit Material</h2>
+              <form onSubmit={handleUpdate}>
+                <div className="form-group">
+                  <label>Material ID</label>
+                  <input type="text" value={editingMaterial.material_id} disabled />
+                </div>
+                <div className="form-group">
+                  <label>Material Name</label>
+                  <input type="text" name="name" value={editingMaterial.name} onChange={handleEditChange} required />
+                </div>
+                <div className="form-group">
+                  <label>Supplier</label>
+                  <input type="text" name="supplier" value={editingMaterial.supplier} onChange={handleEditChange} required />
+                </div>
+                <div className="form-group">
+                  <label>Quantity</label>
+                  <input type="number" name="quantity" value={editingMaterial.quantity} onChange={handleEditChange} min="0" required />
+                </div>
+                <div className="form-group">
+                  <label>Price</label>
+                  <input type="number" name="price" value={editingMaterial.price} onChange={handleEditChange} min="0" step="0.01" required />
+                </div>
+                <div className="modal-actions">
+                  <button type="submit" className="save-btn">Update</button>
+                  <button type="button" className="cancel-btn" onClick={() => setShowEditModal(false)}>Cancel</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

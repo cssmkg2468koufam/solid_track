@@ -30,4 +30,5 @@ const getAdminByEmail = async (email) => {
     return rows.length > 0 ? rows[0] : null;
 }
 
-module.exports = { createCustomer, getCustomerByEmail, getCustomerEmail, createNewAdmin, getAdminByEmail };
+
+module.exports = { createCustomer, getCustomerByEmail, getCustomerEmail, createNewAdmin, getAdminByEmail};

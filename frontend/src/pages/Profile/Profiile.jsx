@@ -3,25 +3,38 @@ import { useNavigate } from 'react-router-dom';
 import './Profile.css';
 
 const Profile = () => {
-  const [user, setUser] = useState({
-    full_name: '',
+  const navigate = useNavigate();
+  const [userData, setUserData] = useState({
+    fullName: '',
     email: '',
     phone: '',
-    password: '',
-    confirmPassword: ''
   });
+  const [passwordData, setPasswordData] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: '',
+  });
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState('profile');
+  const [emailError, setEmailError] = useState('');
+  const [initialEmail, setInitialEmail] = useState('');
 
   useEffect(() => {
     const fetchUserData = async () => {
       try {
         const token = localStorage.getItem('token');
-        const response = await fetch('http://localhost:5001/api/auth/me', {
+        if (!token) {
+          navigate('/login');
+          return;
+        }
+
+        const response = await fetch('http://localhost:5001/routes/userRoutes/profile', {
+          method: 'GET',
           headers: {
-            'Authorization': `Bearer ${token}`
-          }
+            'Authorization': `Bearer ${token}`,
+          },
         });
 
         if (!response.ok) {
@@ -29,51 +42,74 @@ const Profile = () => {
         }
 
         const data = await response.json();
-        setUser({
-          ...data,
-          password: '',
-          confirmPassword: ''
+        setUserData({
+          fullName: data.fullName,
+          email: data.email,
+          phone: data.phone,
         });
+        setInitialEmail(data.email); // Store the initial email
+        setLoading(false);
       } catch (err) {
         setError(err.message);
+        setLoading(false);
       }
     };
 
     fetchUserData();
-  }, []);
+  }, [navigate]);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setUser(prev => ({
-      ...prev,
-      [name]: value
-    }));
+  const checkEmailAvailability = async (email) => {
+    if (email === userData.email) return true;
+    
+    try {
+      const response = await fetch(`http://localhost:5001/routes/userRoutes/check-email?email=${encodeURIComponent(email)}`);
+      const data = await response.json();
+      return !data.exists;
+    } catch (err) {
+      console.error("Error checking email:", err);
+      return false;
+    }
   };
 
-  const handleSubmit = async (e) => {
+
+  const handleProfileUpdate = async (e) => {
     e.preventDefault();
     setError('');
     setSuccess('');
+    setEmailError('');
 
-    if (user.password !== user.confirmPassword) {
-      setError('Passwords do not match');
+    // Validate email
+    if (!userData.email || !/^\S+@\S+\.\S+$/.test(userData.email)) {
+      setEmailError('Please enter a valid email address');
+      return;
+    }
+
+    // Check if email is available
+    const isEmailAvailable = await checkEmailAvailability(userData.email);
+    if (!isEmailAvailable) {
+      setEmailError('Email already in use');
       return;
     }
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5001/api/auth/update', {
+      if (!token) {
+        navigate('/login');
+        return;
+      }
+
+      const response = await fetch('http://localhost:5001/routes/userRoutes/profile', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({
-          full_name: user.full_name,
-          email: user.email,
-          phone: user.phone,
-          password: user.password || undefined
-        })
+          fullName: userData.fullName,
+          phone: userData.phone,
+          email: userData.email,
+          currentPassword: passwordData.currentPassword,
+        }),
       });
 
       const data = await response.json();
@@ -82,83 +118,212 @@ const Profile = () => {
         throw new Error(data.error || 'Failed to update profile');
       }
 
+      // Update token if email was changed
+      if (data.token) {
+        localStorage.setItem('token', data.token);
+        setInitialEmail(userData.email);
+      }
+
       setSuccess('Profile updated successfully!');
-      localStorage.setItem('user', JSON.stringify(data.user));
-      
-      // Redirect after 2 seconds
-      setTimeout(() => navigate('/'), 2000);
+      // Clear password field after successful update
+      setPasswordData(prev => ({ ...prev, currentPassword: '' }));
+
     } catch (err) {
       setError(err.message);
     }
   };
 
+  const handlePasswordUpdate = async (e) => {
+    e.preventDefault();
+    setError('');
+    setSuccess('');
+
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      setError('New passwords do not match');
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        navigate('/login');
+        return;
+      }
+
+      const response = await fetch('http://localhost:5001/routes/userRoutes/profile', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          currentPassword: passwordData.currentPassword,
+          newPassword: passwordData.newPassword,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to update password');
+      }
+
+      setSuccess('Password updated successfully!');
+      setPasswordData({
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: '',
+      });
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setUserData(prev => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handlePasswordChange = (e) => {
+    const { name, value } = e.target;
+    setPasswordData(prev => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  if (loading) {
+    return <div className="profile-loading">Loading...</div>;
+  }
+
   return (
     <div className="profile-container">
-      <div className="profile-card">
-        <h2>My Profile</h2>
-        
-        {error && <div className="alert error">{error}</div>}
-        {success && <div className="alert success">{success}</div>}
+      <div className="profile-header">
+        <h1>My Profile</h1>
+        <p>Manage your account information and settings</p>
+      </div>
 
-        <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label>Full Name</label>
-            <input
-              type="text"
-              name="full_name"
-              value={user.full_name}
-              onChange={handleChange}
-              required
-            />
-          </div>
+      <div className="profile-tabs">
+        <button
+          className={`tab-button ${activeTab === 'profile' ? 'active' : ''}`}
+          onClick={() => setActiveTab('profile')}
+        >
+          Profile Information
+        </button>
+        <button
+          className={`tab-button ${activeTab === 'password' ? 'active' : ''}`}
+          onClick={() => setActiveTab('password')}
+        >
+          Change Password
+        </button>
+      </div>
 
-          <div className="form-group">
-            <label>Email</label>
-            <input
-              type="email"
-              name="email"
-              value={user.email}
-              onChange={handleChange}
-              required
-              disabled
-            />
-          </div>
+      {error && <div className="alert error">{error}</div>}
+      {success && <div className="alert success">{success}</div>}
 
-          <div className="form-group">
-            <label>Phone Number</label>
-            <input
-              type="tel"
-              name="phone"
-              value={user.phone}
-              onChange={handleChange}
-              required
-            />
-          </div>
+      <div className="profile-content">
+        {activeTab === 'profile' ? (
+          <form onSubmit={handleProfileUpdate} className="profile-form">
+            <div className="form-group">
+              <label htmlFor="fullName">Full Name</label>
+              <input
+                type="text"
+                id="fullName"
+                name="fullName"
+                value={userData.fullName}
+                onChange={handleInputChange}
+                required
+              />
+            </div>
 
-          <div className="form-group">
-            <label>New Password (leave blank to keep current)</label>
-            <input
-              type="password"
-              name="password"
-              value={user.password}
-              onChange={handleChange}
-              placeholder="New password"
-            />
-          </div>
+            <div className="form-group">
+              <label htmlFor="email">Email Address</label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                value={userData.email}
+                onChange={handleInputChange}
+                required
+              />
+              {emailError && <p className="error-text">{emailError}</p>}
+            </div>
 
-          <div className="form-group">
-            <label>Confirm New Password</label>
-            <input
-              type="password"
-              name="confirmPassword"
-              value={user.confirmPassword}
-              onChange={handleChange}
-              placeholder="Confirm new password"
-            />
-          </div>
+            <div className="form-group">
+              <label htmlFor="phone">Phone Number</label>
+              <input
+                type="tel"
+                id="phone"
+                name="phone"
+                value={userData.phone}
+                onChange={handleInputChange}
+                required
+              />
+            </div>
 
-          <button type="submit" className="update-btn">Update Profile</button>
-        </form>
+            <div className="form-group">
+              <label htmlFor="currentPassword">Current Password (required for email changes)</label>
+              <input
+                type="password"
+                id="currentPassword"
+                name="currentPassword"
+                value={passwordData.currentPassword}
+                onChange={handlePasswordChange}
+                required={userData.email !== initialEmail}
+              />
+            </div>
+
+            <button type="submit" className="update-button">
+              Update Profile
+            </button>
+
+          </form>
+        ) : (
+          <form onSubmit={handlePasswordUpdate} className="password-form">
+            <div className="form-group">
+              <label htmlFor="currentPassword">Current Password</label>
+              <input
+                type="password"
+                id="currentPassword"
+                name="currentPassword"
+                value={passwordData.currentPassword}
+                onChange={handlePasswordChange}
+                required
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="newPassword">New Password</label>
+              <input
+                type="password"
+                id="newPassword"
+                name="newPassword"
+                value={passwordData.newPassword}
+                onChange={handlePasswordChange}
+                required
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="confirmPassword">Confirm New Password</label>
+              <input
+                type="password"
+                id="confirmPassword"
+                name="confirmPassword"
+                value={passwordData.confirmPassword}
+                onChange={handlePasswordChange}
+                required
+              />
+            </div>
+
+            <button type="submit" className="update-button">
+              Change Password
+            </button>
+          </form>
+        )}
       </div>
     </div>
   );

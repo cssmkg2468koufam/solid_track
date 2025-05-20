@@ -32,18 +32,17 @@ const createProduct = async (productName, description, quantity, price, status, 
   }
 }
 
-const addMaterialToProduct = async (product_id, material_id, quantity_required, unit) => {
+const addMaterialToProduct = async (product_id, material_id, quantity_required) => {
   const query = `
     INSERT INTO product_raw_materials 
-    (product_id, material_id, quantity_required, unit) 
-    VALUES (?, ?, ?, ?)
+    (product_id, material_id, quantity_required) 
+    VALUES (?, ?, ?)
   `;
   try {
     const [result] = await pool.query(query, [
       product_id,
       material_id,
-      quantity_required,
-      unit
+      quantity_required
     ]);
     return result.insertId;
   } catch (error) {
@@ -138,5 +137,6 @@ const getAllProductById = async (id) => {
     throw err;
   }
 };
+
 
 module.exports = {getAll, createProduct, getProductsByCategory, getProductById, editProduct, deleteProduct, getAllProductById, getAllProductsByCategory, addMaterialToProduct};

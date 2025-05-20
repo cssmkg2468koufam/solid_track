@@ -1,4 +1,4 @@
-const { getCustomers,deleteCustomerModel } = require('../models/customerModel');
+const { getCustomers,deleteCustomerModel, getCustomerCountModel } = require('../models/customerModel');
 
 const getAllCustomers = async (req, res) => { 
     try {
@@ -26,4 +26,14 @@ const deleteCustomer = async (req, res) => {
     }
 }
 
-module.exports = { getAllCustomers, deleteCustomer };
+const getCustomerCount = async (req, res) => {
+  try {
+    const count = await getCustomerCountModel();
+    res.json({ count });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+
+module.exports = { getAllCustomers, deleteCustomer, getCustomerCount };

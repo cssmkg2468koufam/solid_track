@@ -5,19 +5,61 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const { get } = require("http");
+const bodyParser = require("body-parser");
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
-const { getAllPayments, updateStatus } = require('../controllers/paymentController');
+const db = require("../config/db");
+
+const { getAllPayments, updateStatus, getPaymentDetailsByOrder, handleStripeWebhook } = require('../controllers/paymentController');
+
+router.post("/webhook", bodyParser.raw({ type: "application/json" }), handleStripeWebhook);
 
 router.get('/get', getAllPayments);
-router.put('/updateStatus/:payment_id',updateStatus);
+router.put('/updateStatus/:paymentId', updateStatus);
+router.get('/payment-details/:order_id', getPaymentDetailsByOrder);
+
+// New endpoint for customer payments
+router.get('/customer-payments/:customer_id', async (req, res) => {
+  try {
+    const { customer_id } = req.params;
+    
+    const payments = await pool.query(`
+      SELECT 
+        p.payment_id,
+        p.order_id,
+        p.amount,
+        p.remain_balance,
+        p.payment_method,
+        p.status,
+        p.created_at as payment_date,
+        o.total_amount as order_total,
+        o.status as order_status
+      FROM payment p
+      JOIN orders o ON p.order_id = o.order_id
+      WHERE p.customer_id = ?
+      ORDER BY p.created_at DESC
+    `, [customer_id]);
+
+    res.json({ 
+      success: true,
+      payments: payments[0] 
+    });
+  } catch (err) {
+    console.error('Error fetching customer payments:', err);
+    res.status(500).json({ 
+      success: false,
+      error: err.message 
+    });
+  }
+});
+
 router.get('/get-pending', async (req, res) => {
   try {
     const payments = await pool.query(`
       SELECT p.*, c.full_name AS customer_name
       FROM payment p
       JOIN customer c ON p.customer_id = c.customer_id
-      WHERE p.status = 'pending'
+      Order by p.created_at Asc
     `);
     res.json(payments[0]);
   } catch (err) {
@@ -132,7 +174,7 @@ router.post('/upload-receipt', upload.single('receipt'), async (req, res) => {
 router.post("/create-checkout-session", async (req, res) => {
   try {
     const { order_id, amount } = req.body;
-    
+
     if (!order_id || !amount) {
       return res.status(400).json({
         success: false,
@@ -140,6 +182,7 @@ router.post("/create-checkout-session", async (req, res) => {
       });
     }
 
+    const status = "paid";
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: [{
@@ -153,22 +196,93 @@ router.post("/create-checkout-session", async (req, res) => {
         quantity: 1,
       }],
       mode: 'payment',
-      success_url: `${process.env.FRONTEND_URL}/invoice/${order_id}`,
+      success_url: `${process.env.FRONTEND_URL}/payment-success?order_id=${order_id}&status=paid&amount=${amount}`,
       cancel_url: `${process.env.FRONTEND_URL}/checkout`,
+      metadata: {
+        order_id,
+        paymentType: 'full',
+        amount,
+        status,
+      }
     });
-    
+
     res.json({ 
       success: true,
       sessionId: session.id 
     });
-    
   } catch (error) {
     console.error('Error creating checkout session:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       success: false,
       error: 'Payment processing failed',
-      details: error.message 
+      details: error.message
     });
+  }
+});
+
+router.post("/create-advance-checkout-session", async (req, res) => {
+  const { order_id, amount, remain_balance } = req.body;
+  console.log("order_id", order_id);
+  console.log("amount", amount);
+  console.log("remain_balance", remain_balance);
+
+  try { 
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      line_items: [{
+        price_data: {
+          currency: 'lkr',
+          product_data: {
+            name: `Order #${order_id} Advance Payment`,
+          },
+          unit_amount: amount,
+        },
+        quantity: 1,
+      }],
+      mode: 'payment',
+      success_url: `${process.env.FRONTEND_URL}/payment-success?order_id=${order_id}&status=advanced-paid&amount=${amount}&remain_balance=${remain_balance}`,
+      cancel_url: `${process.env.FRONTEND_URL}/checkout`,
+      metadata: {
+        order_id,
+        paymentType: 'advance',
+        remain_balance,
+      }
+    });
+
+    res.json({ 
+      success: true,
+      sessionId: session.id 
+    });
+  } catch (error) {
+    console.error('Error creating checkout session:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Payment processing failed',
+      details: error.message
+    });
+  }
+});
+
+router.post("/update-order-status", async (req, res) => {
+  const { order_id, status, remain_balance } = req.body;
+
+  try {
+    let query, params;
+    if (status === "advanced-paid") {
+      query = "UPDATE orders SET status = ?, remain_balance = ?, created_at = NOW() WHERE order_id = ?";
+      params = [status, remain_balance, order_id];
+    } else if (status === "paid") {
+      query = "UPDATE orders SET status = ?, remain_balance = '0', created_at = NOW() WHERE order_id = ?";
+      params = [status, order_id];
+    } else {
+      return res.status(400).json({ error: "Invalid status" });
+    }
+
+    await db.query(query, params);
+    res.json({ message: "Order status updated successfully" });
+  } catch (err) {
+    console.error("Error updating order:", err);
+    res.status(500).json({ error: "Failed to update order status" });
   }
 });
 

@@ -35,6 +35,8 @@ const ApprovePayment = () => {
   }, []);
 
   const handleStatusUpdate = async (paymentId, newStatus) => {
+
+    console.log("Updating payment status:", paymentId, newStatus);
     try {
       const token = localStorage.getItem('token');
       const response = await fetch(`http://localhost:5001/routes/paymentRoutes/updateStatus/${paymentId}`, {
@@ -50,6 +52,7 @@ const ApprovePayment = () => {
         const errorData = await response.json();
         throw new Error(errorData.error || 'Failed to update payment status');
       }
+      fetchPendingPayments();
 
       // Optimistically update the UI
       setPayments(prevPayments => 
@@ -76,6 +79,8 @@ const ApprovePayment = () => {
   };
 
   const updateOrderStatus = async (orderId, newStatus) => {
+
+    console.log("Updating order status:", orderId, newStatus);
     try {
       const token = localStorage.getItem('token');
       const response = await fetch(`http://localhost:5001/routes/orderRoutes/updateStatus/${orderId}`, {
@@ -86,10 +91,12 @@ const ApprovePayment = () => {
         },
         body: JSON.stringify({ status: newStatus })
       });
+      
 
       if (!response.ok) {
         throw new Error('Failed to update order status');
       }
+      
     } catch (err) {
       console.error('Error updating order status:', err);
     }
@@ -193,14 +200,14 @@ const ApprovePayment = () => {
                     </td>
                     <td>
                       <select
-                        value={p.status || 'pending'}
-                        onChange={(e) => handleStatusUpdate(p.payment_id, e.target.value)}
-                        className={`status-select ${(p.status || 'pending').toLowerCase()}`}
-                      >
-                        <option value="pending">Pending</option>
-                        <option value="paid">Paid</option>
-                        <option value="rejected">Rejected</option>
-                      </select>
+  value={p.status}
+  onChange={(e) => handleStatusUpdate(p.payment_id, e.target.value)}
+  className={`status-select ${(p.status || 'pending').toLowerCase()}`}
+>
+  <option value="pending">Pending</option>
+  <option value="paid">Paid</option>
+  <option value="rejected">Rejected</option>
+</select>
                     </td>
                   </tr>
                 ))

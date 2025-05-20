@@ -14,6 +14,7 @@ const Products = () => {
   const [editingProduct, setEditingProduct] = useState(null);
 const [materials, setMaterials] = useState([]); // New state for materials
   const [selectedMaterials, setSelectedMaterials] = useState([]); // New state for selected materials
+  const [selectedFile, setSelectedFile] = useState(null);
   
   
   const [newProduct, setNewProduct] = useState({
@@ -30,6 +31,11 @@ const [materials, setMaterials] = useState([]); // New state for materials
     fetchProducts();
     fetchMaterials();
   }, []);
+
+  const handleFileChange = (e) => {
+  setSelectedFile(e.target.files[0]);
+};
+
 
   const fetchProducts = async () => {
     setError(null);
@@ -91,7 +97,7 @@ const [materials, setMaterials] = useState([]); // New state for materials
 
   // Add a new material row
   const addMaterialRow = () => {
-    setSelectedMaterials([...selectedMaterials, { material_id: '', quantity_required: 0, unit: '' }]);
+    setSelectedMaterials([...selectedMaterials, { material_id: '', quantity_required: 0 }]);
   };
 
   // Remove a material row
@@ -105,13 +111,22 @@ const [materials, setMaterials] = useState([]); // New state for materials
   const handleAddProduct = async (e) => {
   e.preventDefault();
   try {
-    // First, create the product
+    const formData = new FormData();
+    formData.append('productName', newProduct.productName);
+    formData.append('description', newProduct.description);
+    formData.append('quantity', newProduct.quantity);
+    formData.append('price', newProduct.price);
+    formData.append('status', newProduct.status);
+    formData.append('category', newProduct.category);
+    
+    if (selectedFile) {
+      formData.append('image', selectedFile);
+    }
+
+    // First, create the product with image
     const response = await fetch('http://localhost:5001/routes/productRoutes/add', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(newProduct),
+      body: formData, // No Content-Type header needed, browser will set it with boundary
     });
 
     if (!response.ok) {
@@ -120,14 +135,9 @@ const [materials, setMaterials] = useState([]); // New state for materials
 
     const productData = await response.json();
     
-    // Make sure we have the product ID
-    if (!productData.product_id && !productData.insertId) {
-      throw new Error('Failed to get product ID from response');
-    }
-    
+    // Rest of your existing code for materials...
     const productId = productData.product_id || productData.insertId;
 
-    // Then, add the materials if any are selected
     if (selectedMaterials.length > 0) {
       const materialPromises = selectedMaterials
         .filter(material => material.material_id && material.quantity_required > 0)
@@ -141,19 +151,14 @@ const [materials, setMaterials] = useState([]); // New state for materials
               product_id: productId,
               material_id: material.material_id,
               quantity_required: material.quantity_required,
-              unit: material.unit
             }),
           })
         );
 
-      // Wait for all material additions to complete
       await Promise.all(materialPromises);
     }
 
-    // Refresh the products list
     fetchProducts();
-    
-    // Reset form state
     setNewProduct({
       productName: '',
       description: '',
@@ -164,6 +169,7 @@ const [materials, setMaterials] = useState([]); // New state for materials
       imageUrl: ''
     });
     setSelectedMaterials([]);
+    setSelectedFile(null);
     setShowAddModal(false);
   } catch (err) {
     console.error('Error adding product:', err);
@@ -186,37 +192,41 @@ const [materials, setMaterials] = useState([]); // New state for materials
   };
 
   const handleUpdateProduct = async (e) => {
-    e.preventDefault();
-    try {
-      const response = await fetch(`http://localhost:5001/routes/productRoutes/edit/${editingProduct.product_id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          productName: editingProduct.productName,
-          description: editingProduct.description,
-          quantity: editingProduct.quantity,
-          price: editingProduct.price,
-          status: editingProduct.status,
-          category: editingProduct.category,
-          imageUrl: editingProduct.imageUrl
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      await response.json();
-      fetchProducts();
-      setShowEditModal(false);
-      setEditingProduct(null);
-    } catch (err) {
-      console.error('Error updating product:', err);
-      setError(err.message);
+  e.preventDefault();
+  try {
+    const formData = new FormData();
+    formData.append('productName', editingProduct.productName);
+    formData.append('description', editingProduct.description);
+    formData.append('quantity', editingProduct.quantity);
+    formData.append('price', editingProduct.price);
+    formData.append('status', editingProduct.status);
+    formData.append('category', editingProduct.category);
+    
+    if (selectedFile) {
+      formData.append('image', selectedFile);
+    } else if (editingProduct.imageUrl) {
+      formData.append('existingImage', editingProduct.imageUrl);
     }
-  };
+
+    const response = await fetch(`http://localhost:5001/routes/productRoutes/edit/${editingProduct.product_id}`, {
+      method: 'PUT',
+      body: formData,
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    await response.json();
+    fetchProducts();
+    setShowEditModal(false);
+    setEditingProduct(null);
+    setSelectedFile(null);
+  } catch (err) {
+    console.error('Error updating product:', err);
+    setError(err.message);
+  }
+};
 
   const handleDelete = async (id) => {
     if (!window.confirm('Are you sure you want to delete this product? This action cannot be undone.')) {
@@ -276,7 +286,7 @@ const [materials, setMaterials] = useState([]); // New state for materials
             <thead>
               <tr>
                 <th>Image</th>
-                <th>Product ID</th>
+               
                 <th>Product Name</th>
                 <th>Description</th>
                 <th>Quantity</th>
@@ -308,7 +318,7 @@ const [materials, setMaterials] = useState([]); // New state for materials
                         <div className="image-placeholder">No Image</div>
                       )}
                     </td>
-                    <td>{product.product_id}</td>
+                  
                     <td>{product.product_name}</td>
                     <td>{product.description}</td>
                     <td>{product.quantity}</td>
@@ -399,16 +409,15 @@ const [materials, setMaterials] = useState([]); // New state for materials
                     <option value="Interlock">Interlock</option>
                   </select>
                 </div>
-                <div className="form-group">
-                  <label>Image URL</label>
-                  <input
-                    type="text"
-                    name="imageUrl"
-                    value={newProduct.imageUrl}
-                    onChange={handleInputChange}
-                    placeholder="/images/flowerpots_1.jpg"
-                  />
-                </div>
+                {/* Replace the Image URL input with file upload */}
+<div className="form-group">
+  <label>Product Image</label>
+  <input
+    type="file"
+    accept="image/*"
+    onChange={handleFileChange}
+  />
+</div>
                 
 
                 <div className="form-group">
@@ -453,18 +462,6 @@ const [materials, setMaterials] = useState([]); // New state for materials
                         required
                       />
                       
-                      <select
-                        value={material.unit}
-                        onChange={(e) => handleMaterialChange(index, 'unit', e.target.value)}
-                        required
-                      >
-                        <option value="">Select Unit</option>
-                        <option value="kg">kg</option>
-                        <option value="cubic_meters">cubic_meters</option>
-                        <option value="bags">bags</option>
-                        <option value="liters">liters</option>
-
-                      </select>
                       
                       <button 
                         type="button" 
@@ -492,117 +489,120 @@ const [materials, setMaterials] = useState([]); // New state for materials
         )}
 
         {/* Edit Product Modal */}
-        {showEditModal && editingProduct && (
-          <div className="modal-overlay">
-            <div className="modal-content">
-              <h2>Edit Product</h2>
-              <form onSubmit={handleUpdateProduct}>
-                <div className="form-group">
-                  <label>Product Name</label>
-                  <input
-                    type="text"
-                    name="productName"
-                    value={editingProduct.productName}
-                    onChange={(e) => setEditingProduct({...editingProduct, productName: e.target.value})}
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Description</label>
-                  <textarea
-                    name="description"
-                    value={editingProduct.description}
-                    onChange={(e) => setEditingProduct({...editingProduct, description: e.target.value})}
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Quantity</label>
-                  <input
-                    type="number"
-                    name="quantity"
-                    value={editingProduct.quantity}
-                    onChange={(e) => setEditingProduct({...editingProduct, quantity: Number(e.target.value)})}
-                    min="0"
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Price (Rs)</label>
-                  <input
-                    type="number"
-                    name="price"
-                    value={editingProduct.price}
-                    onChange={(e) => setEditingProduct({...editingProduct, price: Number(e.target.value)})}
-                    min="0"
-                    step="0.01"
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Category</label>
-                  <select
-                    name="category"
-                    value={editingProduct.category}
-                    onChange={(e) => setEditingProduct({...editingProduct, category: e.target.value})}
-                  >
-                    <option value="Flower Pots">Flower Pots</option>
-                    <option value="Lamppost">Lamppost</option>
-                    <option value="Concrete Ring">Concrete Ring</option>
-                    <option value="Waterlili">Waterlili</option>
-                    <option value="Interlock">Interlock</option>
-                  </select>
-                </div>
-                <div className="form-group">
-                  <label>Image URL</label>
-                  <input
-                    type="text"
-                    name="imageUrl"
-                    value={editingProduct.imageUrl}
-                    onChange={(e) => setEditingProduct({...editingProduct, imageUrl: e.target.value})}
-                    placeholder="/images/flowerpots_1.jpg"
-                  />
-                  {editingProduct.imageUrl && (
-                    <div className="image-preview">
-                      <img 
-                        src={editingProduct.imageUrl} 
-                        alt="Preview" 
-                        onError={(e) => {
-                          e.target.onerror = null;
-                          e.target.src = '/images/placeholder-image.png';
-                        }}
-                      />
-                    </div>
-                  )}
-                </div>
-                <div className="form-group">
-                  <label>Status</label>
-                  <select
-                    name="status"
-                    value={editingProduct.status}
-                    onChange={(e) => setEditingProduct({...editingProduct, status: e.target.value})}
-                  >
-                    <option value="In Stock">In Stock</option>
-                    <option value="Out of Stock">Out of Stock</option>
-                  </select>
-                </div>
-                <div className="modal-actions">
-                  <button type="submit" className="save-btn">Update</button>
-                  <button 
-                    type="button" 
-                    className="cancel-btn" 
-                    onClick={() => {
-                      setShowEditModal(false);
-                      setEditingProduct(null);
-                    }}
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </form>
+{showEditModal && editingProduct && (
+  <div className="modal-overlay">
+    <div className="modal-content">
+      <h2>Edit Product</h2>
+      <form onSubmit={handleUpdateProduct}>
+        <div className="form-group">
+          <label>Product Name</label>
+          <input
+            type="text"
+            name="productName"
+            value={editingProduct.productName}
+            onChange={(e) => setEditingProduct({...editingProduct, productName: e.target.value})}
+            required
+          />
+        </div>
+        <div className="form-group">
+          <label>Description</label>
+          <textarea
+            name="description"
+            value={editingProduct.description}
+            onChange={(e) => setEditingProduct({...editingProduct, description: e.target.value})}
+            required
+          />
+        </div>
+        <div className="form-group">
+          <label>Quantity</label>
+          <input
+            type="number"
+            name="quantity"
+            value={editingProduct.quantity}
+            onChange={(e) => setEditingProduct({...editingProduct, quantity: Number(e.target.value)})}
+            min="0"
+            required
+          />
+        </div>
+        <div className="form-group">
+          <label>Price (Rs)</label>
+          <input
+            type="number"
+            name="price"
+            value={editingProduct.price}
+            onChange={(e) => setEditingProduct({...editingProduct, price: Number(e.target.value)})}
+            min="0"
+            step="0.01"
+            required
+          />
+        </div>
+        <div className="form-group">
+          <label>Category</label>
+          <select
+            name="category"
+            value={editingProduct.category}
+            onChange={(e) => setEditingProduct({...editingProduct, category: e.target.value})}
+          >
+            <option value="Flower Pots">Flower Pots</option>
+            <option value="Lamppost">Lamppost</option>
+            <option value="Concrete Ring">Concrete Ring</option>
+            <option value="Waterlili">Waterlili</option>
+            <option value="Interlock">Interlock</option>
+          </select>
+        </div>
+        <div className="form-group">
+          <label>Product Image</label>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={(e) => setSelectedFile(e.target.files[0])}
+          />
+          {editingProduct.imageUrl && (
+            <div className="image-preview">
+              <img 
+                src={editingProduct.imageUrl} 
+                alt="Preview" 
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = '/images/placeholder-image.png';
+                }}
+              />
+              <input
+                type="hidden"
+                name="existingImage"
+                value={editingProduct.imageUrl}
+              />
             </div>
-          </div>
-        )}
+          )}
+        </div>
+        <div className="form-group">
+          <label>Status</label>
+          <select
+            name="status"
+            value={editingProduct.status}
+            onChange={(e) => setEditingProduct({...editingProduct, status: e.target.value})}
+          >
+            <option value="In Stock">In Stock</option>
+            <option value="Out of Stock">Out of Stock</option>
+          </select>
+        </div>
+        <div className="modal-actions">
+          <button type="submit" className="save-btn">Update</button>
+          <button 
+            type="button" 
+            className="cancel-btn" 
+            onClick={() => {
+              setShowEditModal(false);
+              setEditingProduct(null);
+            }}
+          >
+            Cancel
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+)}
       </div>
     </div>
   );

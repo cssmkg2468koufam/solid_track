@@ -11,7 +11,7 @@ const adminprofileRoutes = require("./routes/adminprofileRoutes"); // Import the
 const cartRoutes = require("./routes/cartRoutes"); // Import the cart routes
 const orderRoutes = require("./routes/orderRoutes"); // Import the order routes
 const paymentRoutes = require("./routes/paymentRoutes"); // Import the payment routes
-
+const dashboardRoutes = require("./routes/dashboardRoutes"); // Import the dashboard routes
 const app = express();
 
 app.use(cors());
@@ -26,7 +26,7 @@ app.use("/routes/supplierRoutes", supplierRoutes);
 app.use("/routes/adminprofileRoutes", adminprofileRoutes); // Use the admin profile routes
 app.use("/routes/cartRoutes",cartRoutes); // Import and use the cart routes
 app.use("/routes/paymentRoutes", paymentRoutes); // Import and use the payment routes
-
+app.use("/routes/dashboardRoutes", dashboardRoutes); // Import and use the dashboard routes
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 

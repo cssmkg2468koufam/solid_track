@@ -1,4 +1,4 @@
-const { getMaterials, createMaterialModel, deleteMaterialModel, editMaterialModel } = require('../models/materialModel');
+const { getMaterials, createMaterialModel, deleteMaterialModel, editMaterialModel, getMaterialCountModel } = require('../models/materialModel');
 
 const getAllMaterials = async (req, res) => { 
     try {
@@ -11,14 +11,14 @@ const getAllMaterials = async (req, res) => {
 }
 
 const CreateMaterial = async (req, res) => {
-    const { material_id, name, supplier, quantity, unit, price, purchase_date, stock } = req.body;
+    const { material_id, name, supplier, quantity,  price, purchase_date, stock } = req.body;
 
-    if (!material_id || !name || !supplier || !quantity || !unit || !price || !purchase_date || !stock) {
+    if (!material_id || !name || !supplier || !quantity || !price || !purchase_date || !stock) {
         return res.status(400).json({ error: 'Please fill all fields' });
     }
 
     try {
-        await createMaterialModel(material_id, name, supplier, quantity, unit, price, purchase_date, stock);
+        await createMaterialModel(material_id, name, supplier, quantity, price, purchase_date, stock);
         res.status(201).json({ message: 'Material created successfully' });
     } catch (err) {
         console.error('Error creating material:', err);
@@ -39,14 +39,14 @@ const deleteMaterial = async (req, res) => {
 
 const editMaterial = async (req, res) => {
     const { id } = req.params;
-    const { name, supplier, quantity, unit, price, purchase_date } = req.body;
+    const { name, supplier, quantity, price, purchase_date } = req.body;
 
-    if (!name || !supplier || !quantity || !unit || !price) {
+    if (!name || !supplier || !quantity || !price || !purchase_date) {
         return res.status(400).json({ error: 'Please fill all required fields' });
     }
 
     try {
-        await editMaterialModel(id, name, supplier, quantity, unit, price);
+        await editMaterialModel(id, name, supplier, quantity, price, purchase_date);
         res.status(200).json({ message: 'Material updated successfully' });
     } catch (err) {
         console.error('Error updating material:', err);
@@ -54,4 +54,5 @@ const editMaterial = async (req, res) => {
     }
 };
 
-module.exports = { getAllMaterials, CreateMaterial, deleteMaterial, editMaterial };
+
+module.exports = { getAllMaterials, CreateMaterial, deleteMaterial, editMaterial};
