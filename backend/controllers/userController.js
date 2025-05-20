@@ -2,14 +2,14 @@ const bcrypt = require("bcryptjs");
 const { createCustomer, getCustomerByEmail} = require("../models/userModel");
 
 const registerCustomer = async (req, res) => {
-    const {fullName, email, phone, password, agree_terms} = req.body;
+    const {fullName, email, phone, password} = req.body;
     if (!fullName || !email || !phone || !password) {
         return res.status(400).json({error: "Please fill all fields"});
     }
 
     try{
         const password_hash = await bcrypt.hash(password, 10);
-        await createCustomer(fullName, email, phone, password_hash, agree_terms);
+        await createCustomer(fullName, email, phone, password_hash);
         res.status(201).json({message: "User created successfully"});
     }
     catch(err){    

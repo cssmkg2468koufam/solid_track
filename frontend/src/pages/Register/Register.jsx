@@ -8,7 +8,7 @@ const Register = () => {
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [agreeTerms, setAgreeTerms] = useState(false);
+  // const [agreeTerms, setAgreeTerms] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
 
@@ -23,7 +23,7 @@ const Register = () => {
       phone,
       password,
       confirmPassword,
-      agree_terms: agreeTerms,
+      //agree_terms: agreeTerms,
     };
 
     try {
