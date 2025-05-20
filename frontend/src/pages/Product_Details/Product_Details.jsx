@@ -313,13 +313,13 @@ const ProductDetails = () => {
               disabled={product.quantity <= 0}
             > Add to Cart
             </button>
-            <button 
+            {/* <button 
               className={`buy-now-btn ${product.quantity <= 0 ? 'disabled' : ''}`} 
               onClick={handleOrderNow}
               disabled={product.quantity <= 0}
             >
               Place Order
-            </button>
+            </button> */}
           </div>
           
           {cartMessage && (

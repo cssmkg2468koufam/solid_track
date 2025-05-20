@@ -77,7 +77,7 @@ const Customers = () => {
         <h1> Customers </h1>
         <div className="header-actions">
           
-          <button className="new-btn">New Customer</button>
+          {/* <button className="new-btn">New Customer</button> */}
         </div>
       </div>
 

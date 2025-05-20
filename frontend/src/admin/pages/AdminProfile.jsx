@@ -61,7 +61,7 @@ const AdminProfile = () => {
 
             <div className="profile-details">
 
-                <label>Email:</label>
+                <label>Email: admin@gmail.com</label>
                 {isEditing ? (
                     <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
                 ) : (
