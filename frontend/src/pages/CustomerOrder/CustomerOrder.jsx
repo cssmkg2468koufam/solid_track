@@ -213,8 +213,9 @@ const CustomerOrder = () => {
             <div key={order.order_id} className="co-order-card">
               <div className="co-order-header">
                 <div className="co-order-meta">
-                  <span className="co-order-id">Order #{order.order_id}</span>
+                  {/* <span className="co-order-id">Order #{order.order_id}</span> */}
                   <span className="co-order-date">Placed on {formatDate(order.created_at)}</span>
+                  <span className="co-contact-btn">Contact us - 0773875830</span>
                 </div>
                 <div className={`co-order-status ${getStatusBadgeClass(order.status)}`}>
                   Status: {order.status}

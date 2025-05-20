@@ -54,8 +54,8 @@
   border: none;
   cursor: pointer;
   font-size: 16px;
-  padding: 8px 12px;
-  margin-right: 20px; /* Adjust as needed */
+  padding: 2px 1px;
+  margin-right: 1px; /* Adjust as needed */
   /* Other existing styles */
   /* Add other styles to match your design */
 }
@@ -71,7 +71,7 @@
   cursor: pointer;
   font-size: 16px;
   padding: 8px 12px;
-  margin-right: 20px; /* Adjust as needed */
+  margin-right: 1px; /* Adjust as needed */
 }
 .my-payments-button:hover {
   background: #ffffff;

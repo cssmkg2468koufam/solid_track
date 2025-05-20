@@ -213,12 +213,12 @@ const Profile = () => {
         >
           Profile Information
         </button>
-        <button
+        {/* <button
           className={`tab-button ${activeTab === 'password' ? 'active' : ''}`}
           onClick={() => setActiveTab('password')}
         >
           Change Password
-        </button>
+        </button> */}
       </div>
 
       {error && <div className="alert error">{error}</div>}

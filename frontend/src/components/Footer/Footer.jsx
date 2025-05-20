@@ -15,16 +15,16 @@ const Footer = () => {
             <a href="/">Home</a>
             <a href="/customerproducts">Products</a>
             <a href="#about-us">About Us</a> {/* Anchor link to About Us section */}
-            <a href="#contact-us">Contact Us</a> {/* Anchor link to Contact Us section */}
+
           </nav>
         </div>
         <div className="footer-section">
-          <h4>Follow Us</h4>
+          {/* <h4>Follow Us</h4>
           <div className="social-icons">
             <a href="https://facebook.com" target="_blank" rel="noopener noreferrer">Facebook</a>
             <a href="https://twitter.com" target="_blank" rel="noopener noreferrer">Twitter</a>
             <a href="https://instagram.com" target="_blank" rel="noopener noreferrer">Instagram</a>
-          </div>
+          </div> */}
         </div>
       </div>
       <div className="footer-bottom">
