@@ -120,25 +120,6 @@
   font-size: 0.85rem;
 }
 
-/* .terms-checkbox {
-  display: flex;
-  align-items: flex-start;
-}
-
-.terms-checkbox input[type="checkbox"] {
-  margin-right: 0.5rem;
-  margin-top: 0.2rem;
-}
-
-.terms-checkbox a {
-  color: #333;
-  text-decoration: none;
-}
-
-.terms-checkbox a:hover {
-  text-decoration: underline;
-} */
-
 
 .password-validation {
   margin-top: 5px;
@@ -154,6 +135,20 @@
 .password-validation .valid {
   color: #00C851; 
   text-align: justify; /* Green for valid */
+}
+
+.password-toggle-icon {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #777; /* Icon color */
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.password-toggle-icon:hover {
+  color: #333; /* Darker color on hover */
 }
 
 .register-button {

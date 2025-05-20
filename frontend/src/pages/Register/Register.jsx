@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import './Register.css';
 import google_icon from '../../assets/google_icon.png'; 
+import { useNavigate } from 'react-router-dom';
 
 const Register = () => {
   const [fullName, setFullName] = useState('');
@@ -12,6 +13,7 @@ const Register = () => {
   const [error, setError] = useState(null);
   const [emailError, setEmailError] = useState(null);
   const [success, setSuccess] = useState(null);
+  const [phoneError, setPhoneError] = useState(null);
   const [passwordErrors, setPasswordErrors] = useState({
     length: false,
     uppercase: false,
@@ -19,6 +21,7 @@ const Register = () => {
     number: false,
     specialChar: false,
   });
+  const navigate = useNavigate();
   const validatePassword = (password) => {
     const errors = {
       length: password.length >= 8,
@@ -52,6 +55,11 @@ const Register = () => {
       setEmailError("Email is required");
       return;
     }
+    if (phone.length !== 10) {
+    setPhoneError("Mobile number must be 10 digits");
+    return;
+  }
+
     // Check if email exists
     const emailExists = await checkEmailExists(email);
     if (emailExists) {
@@ -92,6 +100,9 @@ const Register = () => {
       }
 
       setSuccess("Registration successful! Please login to continue.");
+      setTimeout(() => {
+  navigate('/login');
+}, 1000);
     } catch (err) {
       setError(err.response?.data?.message || "Registration failed. Try again.");
     }
@@ -154,15 +165,30 @@ const Register = () => {
                   type="tel"
                   value={phone}
                   onChange={(e) => {
-                    // Remove any non-numeric characters
-                    const numericValue = e.target.value.replace(/\D/g, '');
+                    // Remove any non-numeric characters and limit to 10 digits
+                    const numericValue = e.target.value.replace(/\D/g, '').slice(0, 10);
                     setPhone(numericValue);
+                    
+                    // Validate length in real-time
+                    if (numericValue.length < 10 && numericValue.length > 0) {
+                      setPhoneError("Mobile number must be 10 digits");
+                    } else {
+                      setPhoneError(null);
+                    }
+                  }}
+                  onBlur={() => {
+                    // Final validation when leaving the field
+                    if (phone.length > 0 && phone.length !== 10) {
+                      setPhoneError("Mobile number must be 10 digits");
+                    } else {
+                      setPhoneError(null);
+                    }
                   }}
                   placeholder="Mobile Number"
                   required
                 />
+                {phoneError && <p className="error-text">{phoneError}</p>}
               </div>
-              
               <div className="form-group">
                 <input
                   type="password"
