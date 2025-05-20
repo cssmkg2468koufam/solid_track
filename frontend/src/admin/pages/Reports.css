@@ -246,11 +246,11 @@
 }
 
 .export-button:hover {
-  background-color: #388e3c;
+  background-color: #0c0453;
 }
 
 .export-button:disabled {
-  background-color: #a5d6a7;
+  background-color: #4735ee;
   cursor: not-allowed;
 }
 
