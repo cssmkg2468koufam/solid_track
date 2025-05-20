@@ -119,7 +119,7 @@ router.post('/upload-receipt', upload.single('receipt'), async (req, res) => {
       const [paymentResult] = await pool.query(`
         INSERT INTO payment 
         (order_id, customer_id, amount, payment_method, img_url, status, created_at)
-        VALUES (?, ?, ?, ?, ?, 'pending', NOW())
+        VALUES (?, ?, ?, ?, ?, 'pending-pay', NOW())
       `, [order_id, customer_id, amount, payment_method, img_url]);
 
       // Update order status

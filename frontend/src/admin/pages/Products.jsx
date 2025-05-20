@@ -290,7 +290,7 @@ const [materials, setMaterials] = useState([]); // New state for materials
                 <th>Quantity</th>
                 <th>Price of one product</th>
                 <th>Category</th>
-                <th>Status</th>
+                
                 <th>Action</th>
               </tr>
             </thead>
@@ -322,11 +322,11 @@ const [materials, setMaterials] = useState([]); // New state for materials
                     <td>{product.quantity}</td>
                     <td>Rs. {product.price_of_one_product}</td>
                     <td>{product.category}</td>
-                    <td>
+                    {/* <td>
                       <span className={`status-badge ${product.status.toLowerCase().replace(' ', '-')}`}>
                         {product.status}
                       </span>
-                    </td>
+                    </td> */}
                     <td>
                       <FaEdit 
                         className="edit-icon" 
