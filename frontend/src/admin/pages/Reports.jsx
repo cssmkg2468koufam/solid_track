@@ -9,13 +9,7 @@ const Reports = () => {
   const navigate = useNavigate();
 
   const reportCards = [
-    {
-      title: 'Sales Reports',
-      description: 'Generate detailed sales reports by date range, product, or customer',
-      icon: <FaChartLine className="report-icon" />,
-      path: '/salesreport',
-      color: '#3498db'
-    },
+    
     {
       title: 'Order Reports',
       description: 'View and analyze order status, fulfillment, and history',
@@ -23,20 +17,7 @@ const Reports = () => {
       path: '/reports-orders',
       color: '#2ecc71'
     },
-    {
-      title: 'Inventory Reports',
-      description: 'Track stock levels, movements, and inventory valuation',
-      icon: <FaBoxes className="report-icon" />,
-      path: '/reports/inventory',
-      color: '#e67e22'
-    },
-    {
-      title: 'Customer Reports',
-      description: 'Analyze customer behavior, purchases, and demographics',
-      icon: <FaUsers className="report-icon" />,
-      path: '/reports/customers',
-      color: '#9b59b6'
-    },
+    
   ];
 
   return (

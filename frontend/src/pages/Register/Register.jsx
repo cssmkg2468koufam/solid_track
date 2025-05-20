@@ -110,26 +110,26 @@ const Register = () => {
 
   return (
     <div className="register-container">
-      <div className="left-panel">
-        <div className="content-wrapper">
+      <div className="register-left-panel">
+        <div className="register-content-wrapper">
           <h1>Craft Lasting Structures with Premium Concrete</h1>
           <p>Join our community for exclusive deals on premium construction materials</p>
         </div>
       </div>
       
-      <div className="right-panel">
-        <div className="form-container">
+      <div className="register-right-panel">
+        <div className="register-form-container">
           <h2>SOLIDTRACK</h2>
           
           <div className="register-form-wrapper">
             <h3>Register</h3>
-            <p className="welcome-text">Create an account to get started.</p>
+            <p className="register-welcome-text">Create an account to get started.</p>
 
-            {error && <p className="error-message">{error}</p>}
-            {success && <p className="success-message">{success}</p>}
+            {error && <p className="register-error-message">{error}</p>}
+            {success && <p className="register-success-message">{success}</p>}
             
             <form onSubmit={handleSubmit}>
-              <div className="form-group">
+              <div className="register-form-group">
                 <input
                   type="text"
                   value={fullName}
@@ -139,7 +139,7 @@ const Register = () => {
                 />
               </div>
               
-              <div className="form-group">
+              <div className="register-form-group">
                 <input
                   type="email"
                   value={email}
@@ -157,10 +157,10 @@ const Register = () => {
                   placeholder="Email Address"
                   required
                 />
-                {emailError && <p className="error-text">{emailError}</p>}
+                {emailError && <p className="register-error-text">{emailError}</p>}
               </div>
 
-              <div className="form-group">
+              <div className="register-form-group">
                 <input
                   type="tel"
                   value={phone}
@@ -187,9 +187,9 @@ const Register = () => {
                   placeholder="Mobile Number"
                   required
                 />
-                {phoneError && <p className="error-text">{phoneError}</p>}
+                {phoneError && <p className="register-error-text">{phoneError}</p>}
               </div>
-              <div className="form-group">
+              <div className="register-form-group">
                 <input
                   type="password"
                   value={password}
@@ -201,7 +201,7 @@ const Register = () => {
                   required
                 />
                 {password && (
-                  <div className="password-validation">
+                  <div className="register-password-validation">
                     <p className={passwordErrors.length ? 'valid' : 'invalid'}>
                       ✓ At least 8 characters
                     </p>
@@ -221,7 +221,7 @@ const Register = () => {
                 )}
               </div>
               
-              <div className="form-group">
+              <div className="register-form-group">
                 <input
                   type="password"
                   value={confirmPassword}
@@ -231,7 +231,7 @@ const Register = () => {
                 />
               </div>
               
-              <div className="form-options">
+              <div className="register-form-options">
                 {/* <div className="terms-checkbox">
                   <input
                     type="checkbox"
@@ -246,17 +246,14 @@ const Register = () => {
               
               <button type="submit" className="register-button">Create Account</button>
               
-              <div className="divider">
+              <div className="register-divider">
                 <span>or</span>
               </div>
               
-              <button type="button" className="google-button">
-                <img src={google_icon} alt="Google" />
-                Sign Up With Google
-              </button>
+              
             </form>
             
-            <div className="login-prompt">
+            <div className="register-login-prompt">
               <p>Already have an account? <a href="/login">Sign in</a></p>
             </div>
           </div>

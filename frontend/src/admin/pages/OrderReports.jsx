@@ -188,7 +188,7 @@ const OrderReports = () => {
 
       // Add header with branding
       doc.setFontSize(24);
-      doc.setTextColor(67, 160, 71); // Green color
+      doc.setTextColor(20, 80, 200); // Green color
       doc.text('SOLIDTRACK', 15, 15);
 
       // Add subtitle
@@ -242,7 +242,7 @@ const OrderReports = () => {
             cellPadding: 2
           },
           headStyles: { 
-            fillColor: [67, 160, 71],
+            fillColor:  [20, 80, 200],
             textColor: [255, 255, 255],
             fontStyle: 'bold'
           },
