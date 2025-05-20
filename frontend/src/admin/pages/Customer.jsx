@@ -76,7 +76,7 @@ const Customers = () => {
       <div className="header">
         <h1> Customers </h1>
         <div className="header-actions">
-          <button className="export-btn">Export</button>
+          
           <button className="new-btn">New Customer</button>
         </div>
       </div>

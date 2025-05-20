@@ -143,7 +143,7 @@ const Supplier = () => {
       <div className="header">
         <h1>Suppliers</h1>
         <div className="header-actions">
-          <button className="export-btn" onClick={handleExportToExcel}>Export</button>
+          
           <button className="add-btn" onClick={handleAddSupplier}>+ New Supplier</button>
         </div>
       </div>

@@ -24,7 +24,6 @@ import ApprovePayments from './admin/pages/ApprovePayments' // Import the Admin 
 import InvoicePage from './pages/Invoice/InvoicePage'; // Import the InvoicePage component
 import Success from './pages/Invoice/Success';
 import Reports from './admin/pages/Reports'; // Import the Reports component
-import SalesReport from './admin/pages/SalesReport'; // Import the SalesReport component
 import OrderReports from './admin/pages/OrderReports'; // Import the OrderReports component
 
 
@@ -48,7 +47,6 @@ const App = () => {
           <Route path='/approve-payments-admin' element={null} /> {/* Admin Profile component */}
           <Route path='/invoice/:orderId' element={null} /> {/* Admin Profile component */}
           <Route path='/reports-admin' element={null} /> {/* Admin Profile component */}
-          <Route path="/salesreport" element={<SalesReport />} />
           <Route path="/reports-orders" element={<null/>} />
           
           <Route path='*' element={<NavBar />} /> 
@@ -79,7 +77,6 @@ const App = () => {
             <Route path="/invoice/:orderId" element={<InvoicePage />} />
             <Route path="payment-success" element={<Success />} />
             <Route path="/reports-admin" element={<Reports />} /> {/* Admin App component */}
-            <Route path="/salesreport" element={<SalesReport />} />
             <Route path="/reports-orders" element={<OrderReports />} />
 
           </Routes>
@@ -100,7 +97,6 @@ const App = () => {
             <Route path="/approve-payments-admin" element={<null />} />
             <Route path='/invoice/:orderId' element={null} /> {/* Admin Profile component */}
             <Route path='/reports-admin' element={null} /> 
-            <Route path="/salesreport" element={null} />
             <Route path="/reports-orders" element={<null/>} />
             <Route path='*' element={<Footer />} />
           </Routes>

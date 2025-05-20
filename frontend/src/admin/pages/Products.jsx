@@ -253,9 +253,7 @@ const [materials, setMaterials] = useState([]); // New state for materials
     }
   };
 
-  const handleExport = () => {
-    alert('Export functionality would be implemented here');
-  };
+ 
 
   return (
     <div className="grid-container">
@@ -265,7 +263,7 @@ const [materials, setMaterials] = useState([]); // New state for materials
         <div className="header">
           <h1>Products</h1>
           <div className="header-actions">
-            <button className="btn export" onClick={handleExport}>Export</button>
+            
             <button className="btn new" onClick={() => setShowAddModal(true)}>+ New Product</button>
           </div>
         </div>

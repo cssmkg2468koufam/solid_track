@@ -276,8 +276,7 @@ const Materials = () => {
         <div className="header">
           <h1>Raw Materials</h1>
           <div className="header-actions">
-            <button className="export-btn" onClick={handleExportToExcel}>Export</button>
-            <button className="details-btn" onClick={handleViewDetails}>Details</button>
+            
             <button className="add-btn" onClick={handleAddMaterial}>+ Add Material</button>
           </div>
         </div>
@@ -291,7 +290,7 @@ const Materials = () => {
             className="search-input"
           />
         </div>
-
+        
         <div className="table-container">
           <table className="materials-table">
             <thead>
@@ -299,7 +298,7 @@ const Materials = () => {
                 <th>Material ID</th>
                 <th>Material Name</th>
                 <th>Supplier</th>
-                <th>Quantity</th>
+                <th>Quantity(Kg)</th>
                 <th>Price</th>
                 <th>Purchase Date</th>
                 <th>Stock</th>
@@ -335,6 +334,11 @@ const Materials = () => {
             </tbody>
           </table>
         </div>
+
+        <div className='unit-details'>
+          <p>Sand 1 cube = 1700kg</p>
+        </div>
+
 
         {showAddModal && (
           <div className="modal-overlay">
@@ -402,7 +406,7 @@ const Materials = () => {
                       />
                     </div>
                     <div className="form-group">
-                      <label>Price (per unit)</label>
+                      <label>Full Price </label>
                       <input 
                         type="number" 
                         name="price" 
@@ -447,7 +451,7 @@ const Materials = () => {
                       />
                     </div>
                     <div className="form-group">
-                      <label>Quantity</label>
+                      <label>Quantity(kg)</label>
                       <input 
                         type="number" 
                         name="quantity" 
@@ -458,7 +462,7 @@ const Materials = () => {
                       />
                     </div>
                     <div className="form-group">
-                      <label>Price (per unit)</label>
+                      <label> Full Price </label>
                       <input 
                         type="number" 
                         name="price" 

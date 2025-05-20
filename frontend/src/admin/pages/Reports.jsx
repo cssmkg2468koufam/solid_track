@@ -12,7 +12,7 @@ const Reports = () => {
     
     {
       title: 'Order Reports',
-      description: 'View and analyze order status, fulfillment, and history',
+      description: 'View and analyze order status',
       icon: <FaFileInvoiceDollar className="report-icon" />,
       path: '/reports-orders',
       color: '#2ecc71'
@@ -27,7 +27,7 @@ const Reports = () => {
       <div className="reports-page">
         <div className="reports-header">
           <h1>Reports Dashboard</h1>
-          <p>Select a report type to view detailed analytics</p>
+          
         </div>
 
         <div className="report-cards-container">

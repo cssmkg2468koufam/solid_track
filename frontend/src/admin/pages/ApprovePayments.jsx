@@ -148,7 +148,7 @@ const ApprovePayment = () => {
         <div className="header">
           <h1>Payment Approval</h1>
           <div className="header-actions">
-            <button className="export-btn">Export</button>
+            
           </div>
         </div>
 

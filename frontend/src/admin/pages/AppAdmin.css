@@ -436,6 +436,10 @@
   color: #666;
   padding: 20px 0;
 }
+.unit-details{
+  margin-top: 20px;
+  color: #c2bbbb;
+}
 /* Modal Overlay */
 .modal-overlay {
   position: fixed;
@@ -778,6 +782,7 @@
   border-radius: 4px;
   border: 1px solid #ddd;
 }
+
 
 /*End product*/
 
@@ -1727,25 +1732,6 @@
   .reports-header h1 {
     font-size: 1.8rem;
   }
-}
-/* Sales Report Page Styles */
-.sales-report-page {
-  padding: 20px;
-  background-color: #f5f7fa;
-  min-height: calc(100vh - 60px);
-}
-
-.page-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-}
-
-.page-header h1 {
-  color: #2c3e50;
-  font-size: 1.8rem;
-  margin: 0;
 }
 
 /* Filter Card Styles */
