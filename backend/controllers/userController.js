@@ -38,6 +38,10 @@ const registerCustomer = async (req, res) => {
         return res.status(400).json({ error: "Please fill all fields" });
     }
 
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        return res.status(400).json({ error: "Invalid email format" });
+    }
+
     if (password !== confirmPassword) {
         return res.status(400).json({ error: "Passwords do not match" });
     }
@@ -99,20 +103,6 @@ const loginUser = async (req, res) => {
     }
 };
 
-const checkEmailExists = async (req, res) => {
-    try {
-        const { email } = req.query;
-        if (!email) {
-            return res.status(400).json({ error: "Email is required" });
-        }
-
-        const customer = await getCustomerEmail(email);
-        res.json({ exists: !!customer });
-    } catch (err) {
-        console.error("Error checking email:", err);
-        res.status(500).json({ error: "Internal Server Error" });
-    }
-};
 
 const getCurrentUser = async (req, res) => {
   try {
@@ -243,4 +233,4 @@ const updateCurrentUser = async (req, res) => {
 };
 
 
-module.exports = { registerCustomer, loginUser, checkEmailExists, getCurrentUser, updateCurrentUser };
+module.exports = { registerCustomer, loginUser, getCurrentUser, updateCurrentUser };

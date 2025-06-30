@@ -7,7 +7,7 @@ getPaymentDetails,
 
 const Stripe = require("stripe");
 const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
-const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
+// const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
 const getAllPayments = async (req, res) => {
   try {
@@ -63,54 +63,12 @@ const getPaymentDetailsByOrder = async (req, res) => {
   }
 };
 
-const handleStripeWebhook = async (req, res) => {
-  const sig = req.headers["stripe-signature"];
 
-  let event;
-  try {
-    event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET);
-  } catch (err) {
-    console.error("Webhook signature verification failed.", err.message);
-    return res.status(400).send(`Webhook Error: ${err.message}`);
-  }
-
-  if (event.type === "checkout.session.completed") {
-    const session = event.data.object;
-    const bookingId = session.metadata?.bookingId;
-    const paymentType = session.metadata?.paymentType;
-
-    if (!bookingId || !paymentType) {
-      return res.status(400).send("Missing metadata");
-    }
-
-    try {
-      if (paymentType === "full") {
-        await db.query(
-          "UPDATE orders SET status = ?, remaining_balance = ? WHERE order_id = ?",
-          ["paid", "0.00", order_id]
-        );
-      } else if (paymentType === "advance") {
-        const remain_balance = session.metadata?.remain_balance || "0.00";
-        await db.query(
-          "UPDATE orders SET status = ?, remaining_balance = ? WHERE order_id = ?",
-          ["advanced-paid", remain_balance, order_id]
-        );
-      }
-
-      return res.status(200).json({ received: true });
-    } catch (dbError) {
-      console.error("Database update failed:", dbError);
-      return res.status(500).send("Database error");
-    }
-  }
-
-  res.status(200).json({ received: true });
-};
 
 module.exports = {
   getAllPayments,
   updateStatus,
     getPendingPayments,
-  handleStripeWebhook,
+
   getPaymentDetailsByOrder,
 };

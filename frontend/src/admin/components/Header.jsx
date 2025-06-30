@@ -10,10 +10,10 @@ const Header = () => {
         <BsJustify className='icon' />
       </div>
       <div className='header-left'>
-        <BsSearch className='icon' />
+        {/* <BsSearch className='icon' /> */}
       </div> 
       <div className='header-right'>
-        <BsFillBellFill className='icon' />
+        {/* <BsFillBellFill className='icon' /> */}
         {/* <BsFillEnvelopeFill className='icon' /> */}
         <BsPersonCircle className='icon' 
           onClick={() => navigate('/adminprofile-admin')}

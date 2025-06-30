@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { loadStripe } from '@stripe/stripe-js';
 import './CheckoutPage.css';
 
+// Initialize Stripe with test public key
 const stripePromise = loadStripe('pk_test_51RNVXHF2XYRh3d2iLEcpEx2QodkbOO76ENgN6RffgmKp90kgpnXvSt0BInWFcBfXfivtNXquLFXO95emR40wedBV005zYzTaG4');
 
 
@@ -18,7 +19,8 @@ const CheckoutPage = () => {
 
    const advance = total * 0.3;
   const balance = total - advance;
-
+  
+  // Redirect if order details are missing
   if (!order_id || !total) {
     navigate('/customerorders');
     return null;
@@ -28,7 +30,7 @@ const CheckoutPage = () => {
     setReceiptFile(e.target.files[0]);
     setErrorMessage('');
   };
-
+  // Handle bank transfer receipt upload
   const handleSubmitReceipt = async (e) => {
     e.preventDefault();
     if (!receiptFile) {
@@ -43,14 +45,14 @@ const CheckoutPage = () => {
       const token = localStorage.getItem('token');
       const customerData = JSON.parse(localStorage.getItem("customer"));
       const customer_id = customerData?.customer_id;
-
+      // Prepare form data with payment details and receipt
       const formData = new FormData();
       formData.append('order_id', order_id);
       formData.append('customer_id', customer_id);
       formData.append('amount', total);
       formData.append('payment_method', 'bank_transfer');
       formData.append('receipt', receiptFile);
-
+      // API call to upload receipt
       const response = await fetch('http://localhost:5001/routes/paymentRoutes/upload-receipt', {
         method: 'POST',
         headers: {
@@ -64,7 +66,7 @@ const CheckoutPage = () => {
       if (!response.ok || !data.success) {
         throw new Error(data.error || 'Failed to upload receipt');
       }
-
+      // Handle success - redirect to invoice after delay
       setUploadSuccess(true);
       setReceiptFile(null);
 
@@ -79,14 +81,14 @@ const CheckoutPage = () => {
       setIsSubmitting(false);
     }
   };
-
+   // Handle advance payment via Stripe (30% of total)
   const handleAdvancePayment = async () => {
     setIsSubmitting(true);
     setErrorMessage('');
 
     try {
       const stripe = await stripePromise;
-
+      // Create Stripe checkout session for advance payment
       const response = await fetch(
         'http://localhost:5001/routes/paymentRoutes/create-advance-checkout-session',
         {
@@ -106,6 +108,7 @@ const CheckoutPage = () => {
       if (!response.ok || !data.success) {
         throw new Error(data.error || 'Payment processing failed');
       }
+      // Redirect to Stripe checkout
       const result = await stripe.redirectToCheckout({
         sessionId: data.sessionId,
       });
@@ -119,6 +122,7 @@ const CheckoutPage = () => {
       setIsSubmitting(false);
     }
   };
+  // Handle full payment via Stripe
   const handleStripePayment = async () => {
     setIsSubmitting(true);
     setErrorMessage('');
@@ -126,7 +130,7 @@ const CheckoutPage = () => {
 
     try {
       const stripe = await stripePromise;
-
+      // Create Stripe checkout session for full payment
       const response = await fetch(
         'http://localhost:5001/routes/paymentRoutes/create-checkout-session',
         {
@@ -147,7 +151,7 @@ const CheckoutPage = () => {
       if (!response.ok || !data.success) {
         throw new Error(data.error || 'Payment processing failed');
       }
-
+       // Redirect to Stripe checkout
       const result = await stripe.redirectToCheckout({
         sessionId: data.sessionId,
       });
@@ -189,7 +193,7 @@ const CheckoutPage = () => {
           <p>{errorMessage}</p>
         </div>
       )}
-
+       {/* Payment method selection */}
       {!uploadSuccess && (
         <div className="payment-options">
           <h2>Select Payment Method</h2>

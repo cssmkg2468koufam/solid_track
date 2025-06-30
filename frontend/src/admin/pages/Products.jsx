@@ -123,10 +123,10 @@ const [materials, setMaterials] = useState([]); // New state for materials
       formData.append('image', selectedFile);
     }
 
-    // First, create the product with image
+   
     const response = await fetch('http://localhost:5001/routes/productRoutes/add', {
       method: 'POST',
-      body: formData, // No Content-Type header needed, browser will set it with boundary
+      body: formData, // pass data as FormData not JSON
     });
 
     if (!response.ok) {
@@ -135,9 +135,9 @@ const [materials, setMaterials] = useState([]); // New state for materials
 
     const productData = await response.json();
     
-    // Rest of your existing code for materials...
-    const productId = productData.product_id || productData.insertId;
-
+    
+    const productId = productData.product_id;
+    // Handle materials after product creation
     if (selectedMaterials.length > 0) {
       const materialPromises = selectedMaterials
         .filter(material => material.material_id && material.quantity_required > 0)
@@ -275,7 +275,7 @@ const [materials, setMaterials] = useState([]); // New state for materials
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
-
+        {/* Display error or loading messages */}
         {error && <div className="error-message">Error: {error}</div>}
         {isLoading && <div className="loading-message">Loading products...</div>}
 
@@ -295,6 +295,7 @@ const [materials, setMaterials] = useState([]); // New state for materials
               </tr>
             </thead>
             <tbody>
+              {/* Filter products based on search term and map to table rows */}
               {products
                 .filter((product) =>
                   product.product_name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -316,7 +317,7 @@ const [materials, setMaterials] = useState([]); // New state for materials
                         <div className="image-placeholder">No Image</div>
                       )}
                     </td>
-                  
+                  {/* Display product details */}
                     <td>{product.product_name}</td>
                     <td>{product.description}</td>
                     <td>{product.quantity}</td>
@@ -328,9 +329,10 @@ const [materials, setMaterials] = useState([]); // New state for materials
                       </span>
                     </td> */}
                     <td>
-                      <FaEdit 
-                        className="edit-icon" 
-                        onClick={() => handleEdit(product)} 
+                      {/* Action buttons for edit and delete */}
+                      <FaEdit
+                        className="edit-icon"
+                        onClick={() => handleEdit(product)}
                         title="Edit Product"
                       />
                       <FaTrash 
@@ -407,17 +409,15 @@ const [materials, setMaterials] = useState([]); // New state for materials
                     <option value="Interlock">Interlock</option>
                   </select>
                 </div>
-                {/* Replace the Image URL input with file upload */}
-<div className="form-group">
-  <label>Product Image</label>
-  <input
-    type="file"
-    accept="image/*"
-    onChange={handleFileChange}
-  />
-</div>
-                
-
+                <div className="form-group">
+                  <label>Product Image</label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileChange}
+                  />
+                </div>
+                {/* Handle image preview */}
                 <div className="form-group">
                   <label>Status</label>
                   <select
@@ -434,7 +434,7 @@ const [materials, setMaterials] = useState([]); // New state for materials
                   <button type="button" onClick={addMaterialRow} className="add-material-btn">
                     + Add Material
                   </button>
-                  
+                  {/* Render material selection rows */}
                   {selectedMaterials.map((material, index) => (
                     <div key={index} className="material-row">
                       <select

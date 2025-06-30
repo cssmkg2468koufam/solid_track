@@ -17,6 +17,7 @@ const AboutUs = () => {
           <p>
             Our team of experts is committed to excellence, ensuring that every product we offer meets the highest standards of quality and safety. Whether you're building a new home, renovating an existing structure, or working on a large-scale commercial project, we have the right concrete solutions for you.
           </p>
+          <p>Contact us - 0773875830</p>
         </div>
       </div>
     </section>

@@ -394,7 +394,7 @@ const OrderReports = () => {
           </button>
         </div>
 
-        <div className="sort-options">
+        {/* <div className="sort-options">
           <h4>Sort by:</h4>
           <button
             className={`sort-button ${sortConfig.key === 'customer_name' ? 'active' : ''}`}
@@ -432,7 +432,7 @@ const OrderReports = () => {
           >
             Remaining Balance {getSortIcon('remain_balance')}
           </button>
-        </div>
+        </div> */}
 
         {filteredData.length > 0 && Object.values(selectedReports).some(value => value) && (
           <div className="preview-section">

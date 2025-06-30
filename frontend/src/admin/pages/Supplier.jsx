@@ -177,7 +177,7 @@ const Supplier = () => {
                   <td>{supplier?.raw_material || ''}</td>
                   <td>{supplier?.mobile || ''}</td>
                   <td>
-                    <FaEdit className="edit-icon" onClick={() => handleEdit(supplier)} />
+                    {/* <FaEdit className="edit-icon" onClick={() => handleEdit(supplier)} /> */}
                     <FaTrash className="delete-icon" onClick={() => handleDelete(supplier?.supplier_id)} />
                   </td>
                 </tr>

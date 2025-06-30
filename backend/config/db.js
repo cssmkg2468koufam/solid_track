@@ -1,12 +1,11 @@
 const mysql = require("mysql2");
 
-
+// Database configuration and connection setup
 const pool = mysql.createPool({
   host: "localhost",
   port: 3306,
   user: "root",
   password: "uok21CG22*",
-  // password: "2001@Gayan#123",
   database: "solid_track",
   waitForConnections: true,
     connectionLimit: 10,

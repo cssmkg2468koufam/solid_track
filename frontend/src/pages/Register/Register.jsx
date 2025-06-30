@@ -4,12 +4,12 @@ import google_icon from '../../assets/google_icon.png';
 import { useNavigate } from 'react-router-dom';
 
 const Register = () => {
+  
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  //const [agreeTerms, setAgreeTerms] = useState(false);
   const [error, setError] = useState(null);
   const [emailError, setEmailError] = useState(null);
   const [success, setSuccess] = useState(null);
@@ -21,7 +21,10 @@ const Register = () => {
     number: false,
     specialChar: false,
   });
+  
   const navigate = useNavigate();
+
+  // Function to validate password against multiple criteria
   const validatePassword = (password) => {
     const errors = {
       length: password.length >= 8,
@@ -34,58 +37,51 @@ const Register = () => {
     return Object.values(errors).every(Boolean);
   };
 
-  const checkEmailExists = async (email) => {
-    try {
-      const response = await fetch(`http://localhost:5001/routes/userRoutes/check-email?email=${encodeURIComponent(email)}`);
-      const data = await response.json();
-      return data.exists;
-    } catch (err) {
-      console.error("Error checking email:", err);
-      return false;
-    }
-  };
-
+  // Main form submission handler
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Reset all error and success messages
     setError(null);
     setSuccess(null);
     setEmailError(null);
 
+    // Basic validation checks
     if (!email) {
       setEmailError("Email is required");
       return;
     }
+    
+    // Phone number validation
     if (phone.length !== 10) {
-    setPhoneError("Mobile number must be 10 digits");
-    return;
-  }
-
-    // Check if email exists
-    const emailExists = await checkEmailExists(email);
-    if (emailExists) {
-      setEmailError("Email already in use");
+      setPhoneError("Mobile number must be 10 digits");
       return;
     }
+    
+    // Password matching check
     if (password !== confirmPassword) {
       setError("Passwords do not match. Please try again.");
       return;
     }
+    
+    // Password strength validation
     if (!validatePassword(password)) {
       setError("Password does not meet requirements.");
       return;
-      }
-      
-      const userData= {
+    }
+    
+    // Prepare user data for API request
+    const userData = {
       fullName,
       email,
       phone,
       password,
       confirmPassword,
-      role: "customer"
-      //agree_terms: agreeTerms,
+      role: "customer"  // Default role for registration
     };
 
     try {
+      // API call to register user
       const response = await fetch("http://localhost:5001/routes/userRoutes/register/customer", {
         method: "POST",
         headers: {
@@ -95,21 +91,25 @@ const Register = () => {
 
       const data = await response.json();
 
+      // Handle API errors
       if (!response.ok) {
-        throw new Error(data.message || 'Registration failed. Try again.');
+        throw new Error(data.error || 'Registration failed. Try again.');
       }
 
+      // Success handling - show message and redirect to login
       setSuccess("Registration successful! Please login to continue.");
       setTimeout(() => {
-  navigate('/login');
-}, 1000);
+        navigate('/login');
+      }, 1000);
     } catch (err) {
-      setError(err.response?.data?.message || "Registration failed. Try again.");
+      // Error handling for API failures
+      setError(err.message || "Registration failed. Try again.");
     }
   };
 
   return (
     <div className="register-container">
+      {/* Left panel with marketing content */}
       <div className="register-left-panel">
         <div className="register-content-wrapper">
           <h1>Craft Lasting Structures with Premium Concrete</h1>
@@ -117,6 +117,7 @@ const Register = () => {
         </div>
       </div>
       
+      {/* Right panel with registration form */}
       <div className="register-right-panel">
         <div className="register-form-container">
           <h2>SOLIDTRACK</h2>
@@ -125,10 +126,12 @@ const Register = () => {
             <h3>Register</h3>
             <p className="register-welcome-text">Create an account to get started.</p>
 
+            {/* Error and success message display */}
             {error && <p className="register-error-message">{error}</p>}
             {success && <p className="register-success-message">{success}</p>}
             
             <form onSubmit={handleSubmit}>
+              {/* Name field */}
               <div className="register-form-group">
                 <input
                   type="text"
@@ -139,6 +142,7 @@ const Register = () => {
                 />
               </div>
               
+              {/* Email field with real-time validation */}
               <div className="register-form-group">
                 <input
                   type="email"
@@ -160,6 +164,7 @@ const Register = () => {
                 {emailError && <p className="register-error-text">{emailError}</p>}
               </div>
 
+              {/* Phone number field with digit validation */}
               <div className="register-form-group">
                 <input
                   type="tel"
@@ -189,6 +194,8 @@ const Register = () => {
                 />
                 {phoneError && <p className="register-error-text">{phoneError}</p>}
               </div>
+              
+              {/* Password field with strength validation */}
               <div className="register-form-group">
                 <input
                   type="password"
@@ -200,27 +207,29 @@ const Register = () => {
                   placeholder="Password"
                   required
                 />
+                {/* Password requirement indicators */}
                 {password && (
                   <div className="register-password-validation">
                     <p className={passwordErrors.length ? 'valid' : 'invalid'}>
-                      ✓ At least 8 characters
+                       At least 8 characters
                     </p>
                     <p className={passwordErrors.uppercase ? 'valid' : 'invalid'}>
-                      ✓ At least one uppercase letter
+                       At least one uppercase letter
                     </p>
                     <p className={passwordErrors.lowercase ? 'valid' : 'invalid'}>
-                      ✓ At least one lowercase letter
+                       At least one lowercase letter
                     </p>
                     <p className={passwordErrors.number ? 'valid' : 'invalid'}>
-                      ✓ At least one number
+                       At least one number
                     </p>
                     <p className={passwordErrors.specialChar ? 'valid' : 'invalid'}>
-                      ✓ At least one special character
+                       At least one special character
                     </p>
                   </div>
                 )}
               </div>
               
+              {/* Confirm password field */}
               <div className="register-form-group">
                 <input
                   type="password"
@@ -232,27 +241,21 @@ const Register = () => {
               </div>
               
               <div className="register-form-options">
-                {/* <div className="terms-checkbox">
-                  <input
-                    type="checkbox"
-                    id="terms"
-                    checked={agreeTerms}
-                    onChange={() => setAgreeTerms(!agreeTerms)}
-                    required
-                  />
-                  <label htmlFor="terms">I agree to the <a href="/terms">Terms of Service</a> and <a href="/privacy">Privacy Policy</a></label>
-                </div> */}
+                {/* Additional options can go here */}
               </div>
               
+              {/* Submit button */}
               <button type="submit" className="register-button">Create Account</button>
               
+              {/* Divider for alternative options */}
               <div className="register-divider">
                 <span>or</span>
               </div>
               
-              
+              {/* Social login options would go here */}
             </form>
             
+            {/* Link to login page for existing users */}
             <div className="register-login-prompt">
               <p>Already have an account? <a href="/login">Sign in</a></p>
             </div>

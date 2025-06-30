@@ -3,7 +3,7 @@ import './Login.css';
 import google_icon from '../../assets/google_icon.png'; 
 import { useNavigate } from 'react-router-dom';
 
-const Login = () => {
+const Login = () => {// State for form inputs and messages
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');  
@@ -15,7 +15,7 @@ const Login = () => {
     setError('');
     setSuccessMessage('');
 
-    try {
+    try {// API call to login endpoint
       const response = await fetch("http://localhost:5001/routes/userRoutes/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -30,8 +30,9 @@ const Login = () => {
 
       setSuccessMessage("Login successful!");
       localStorage.setItem("token", data.user.token);
-      
+      // Handle different user roles after successful login
       if (data.user.role === 'customer') {
+         // Store customer data and redirect to home
         localStorage.setItem("customer", JSON.stringify({
           username: data.user.fullName,
           email: data.user.email,
@@ -41,6 +42,7 @@ const Login = () => {
         }));
         navigate("/");
       } else if(data.user.role === 'admin') {
+        // Store admin data and redirect to admin dashboard
         localStorage.setItem("admin", JSON.stringify({
           email: data.user.email,
           admin_id: data.user.id,

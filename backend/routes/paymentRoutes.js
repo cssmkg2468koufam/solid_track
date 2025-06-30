@@ -6,23 +6,22 @@ const path = require('path');
 const fs = require('fs');
 const { get } = require("http");
 const bodyParser = require("body-parser");
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY); // Initialize Stripe with secret key
 
 const db = require("../config/db");
 
-const { getAllPayments, updateStatus, getPaymentDetailsByOrder, handleStripeWebhook } = require('../controllers/paymentController');
+const { getAllPayments, updateStatus, getPaymentDetailsByOrder } = require('../controllers/paymentController');
 
-router.post("/webhook", bodyParser.raw({ type: "application/json" }), handleStripeWebhook);
 
 router.get('/get', getAllPayments);
 router.put('/updateStatus/:paymentId', updateStatus);
 router.get('/payment-details/:order_id', getPaymentDetailsByOrder);
 
-// New endpoint for customer payments
+// Get all payments for a specific customer
 router.get('/customer-payments/:customer_id', async (req, res) => {
   try {
     const { customer_id } = req.params;
-    
+    // Query joins payment and order tables for complete payment history
     const payments = await pool.query(`
       SELECT 
         p.payment_id,
@@ -52,7 +51,7 @@ router.get('/customer-payments/:customer_id', async (req, res) => {
     });
   }
 });
-
+// Get all pending payments (for admin view)
 router.get('/get-pending', async (req, res) => {
   try {
     const payments = await pool.query(`
@@ -67,7 +66,7 @@ router.get('/get-pending', async (req, res) => {
   }
 });
 
-// Configure upload directory
+// Configure file upload settings for payment receipts
 const uploadDir = path.join(__dirname, '../../uploads/payments');
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
@@ -87,6 +86,7 @@ const upload = multer({
   storage: storage,
   limits: { fileSize: 5 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
+     // Only allow image and PDF files
     const filetypes = /jpeg|jpg|png|pdf/;
     const mimetype = filetypes.test(file.mimetype);
     const extname = filetypes.test(path.extname(file.originalname).toLowerCase());

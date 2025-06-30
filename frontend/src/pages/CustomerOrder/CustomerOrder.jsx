@@ -129,7 +129,7 @@ const CustomerOrder = () => {
         navigate('/login');
         return;
       }
-
+// Validate orderToCancel
       const response = await fetch(`http://localhost:5001/routes/orderRoutes/cancel/${orderToCancel}`, {
         method: 'PUT',
         headers: {

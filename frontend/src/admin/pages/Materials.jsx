@@ -301,7 +301,7 @@ const Materials = () => {
                 <th>Quantity(Kg)</th>
                 <th>Price</th>
                 <th>Purchase Date</th>
-                <th>Stock</th>
+                {/* <th>Stock</th> */}
                 <th>Actions</th>
               </tr>
             </thead>
@@ -315,11 +315,11 @@ const Materials = () => {
                     <td>{material?.quantity || ''}</td>
                     <td>{material?.price || ''}</td>
                     <td>{formatDate(material?.purchase_date) || ''}</td>
-                    <td>
+                    {/* <td>
                       <span className={`status-badge ${material?.stock === 'In Stock' ? 'in-stock' : 'low-stock'}`}>
                         {material?.stock || ''}
                       </span>
-                    </td>
+                    </td> */}
                     <td>
                       <FaEdit className="edit-icon" onClick={() => handleEdit(material)} />
                       <FaTrash className="delete-icon" onClick={() => handleDelete(material?.material_id)} />
@@ -337,6 +337,8 @@ const Materials = () => {
 
         <div className='unit-details'>
           <p>Sand 1 cube = 1700kg</p>
+          <p>Gravel 1 cube = 1900kg</p>
+          <p>Cement 1 bag = 50kg</p>
         </div>
 
 
